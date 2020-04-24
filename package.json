@@ -1,0 +1,28 @@
+{
+  "name": "@q6-enterprises-inc/fluture-file-send",
+  "version": "0.0.1",
+  "description": "Future returning, easy way of sending files.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --recursive tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/q6-enterprises-inc/fluture-file-send.git"
+  },
+  "keywords": [
+    "fluture",
+    "ftp",
+    "sftp",
+    "functional",
+    "upload",
+    "file"
+  ],
+  "author": "Q6 Enterprises, Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/q6-enterprises-inc/fluture-file-send/issues"
+  },
+  "homepage": "https://github.com/q6-enterprises-inc/fluture-file-send#readme",
+  "publishConfig": { "registry": "https://npm.pkg.github.com/" }
+}

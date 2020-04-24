@@ -1,6 +1,6 @@
 {
   "name": "@q6-enterprises-inc/fluture-file-send",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Future returning, easy way of sending files.",
   "main": "index.js",
   "scripts": {
@@ -24,5 +24,7 @@
     "url": "https://github.com/q6-enterprises-inc/fluture-file-send/issues"
   },
   "homepage": "https://github.com/q6-enterprises-inc/fluture-file-send#readme",
-  "publishConfig": { "registry": "https://npm.pkg.github.com/" }
+  "devDependencies": {
+    "mocha": "7.1.1"
+  }
 }

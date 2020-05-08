@@ -26,5 +26,11 @@
   "homepage": "https://github.com/q6-enterprises-inc/fluture-file-send#readme",
   "devDependencies": {
     "mocha": "7.1.1"
+  },
+  "dependencies": {
+    "fluture": "^12.2.0",
+    "ftp": "^0.3.10",
+    "sanctuary": "^3.0.0",
+    "sanctuary-def": "^0.21.1"
   }
 }

@@ -4,7 +4,7 @@
   "description": "Future returning, easy way of sending files.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --recursive tests"
+    "test": "NODE_ENV='development' mocha --recursive tests"
   },
   "repository": {
     "type": "git",
@@ -26,13 +26,13 @@
   "homepage": "https://github.com/q6-enterprises-inc/fluture-file-send#readme",
   "devDependencies": {
     "chai": "4.2.0",
-    "mocha": "7.1.1"
+    "mocha": "7.1.1",
+    "nyc": "15.0.1"
   },
   "dependencies": {
     "fluture": "12.2.0",
     "fluture-sanctuary-types": "6.0.0",
     "ftp": "0.3.10",
-    "nyc": "^15.0.1",
     "sanctuary": "3.0.0",
     "sanctuary-def": "0.21.1"
   }

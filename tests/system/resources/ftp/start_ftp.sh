@@ -6,7 +6,6 @@ grep '/ftp/' /etc/passwd | cut -d':' -f1 | xargs -n1 deluser
 #Default user 'user' with password 'password'
 USERS="user|password"
 
-
 NAME=$(echo $USERS | cut -d'|' -f1)
 PASS=$(echo $USERS | cut -d'|' -f2)
 FOLDER=$(echo $USERS | cut -d'|' -f3)
@@ -27,7 +26,7 @@ unset NAME PASS FOLDER UID
 
 MIN_PORT=21000
 MAX_PORT=21010
-ADDR_OPT="-opasv_address=$ADDRESS"
+ADDR_OPT="-opasv_address=0.0.0.0"
 
 # Used to run custom commands inside container
 if [ ! -z "$1" ]; then

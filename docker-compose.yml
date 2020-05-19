@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+    ftp-server:
+       build: ./tests/system/resources/ftp/
+       ports: 
+        - "20:20"
+        - "21:21" 
+        - "21000-21010:21000-21010"
+    test-server:
+        build: .
+        depends_on: 
+            - ftp-server

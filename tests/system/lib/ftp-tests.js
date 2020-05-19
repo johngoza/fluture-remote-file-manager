@@ -7,8 +7,6 @@ const Readable = require('stream').Readable;
 const { setupDocker, tearDownDocker } = require("./docker-setup");
 const { sendFileViaFtp } = require(path.join(__dirname, "../../../lib/ftp.js"))
 
-
-
 const cleanUpFtp = ftpClient => {
     ftpClient.on("ready", function () {
         ftpClient.delete("/ftp/user/some_file.txt", (err) => {
@@ -17,7 +15,7 @@ const cleanUpFtp = ftpClient => {
     });
 
     const connectionConfig = {
-        "host": "127.0.0.1",
+        "host": "ftp-server",
         "port": 21,
         "remoteFilePath": "/ftp/user/some_file.txt",
         "user": "user",
@@ -38,7 +36,7 @@ describe("SYSTEM TESTS - ftp.js", function () {
             this.timeout(30000);
 
             const connectionConfig = {
-                "host": "127.0.0.1",
+                "host": "ftp-server",
                 "port": 21,
                 "remoteFilePath": "/ftp/user/some_file.txt",
                 "user": "user",
@@ -50,7 +48,7 @@ describe("SYSTEM TESTS - ftp.js", function () {
             readable.push(null);
 
             const verifyResults = (ftpClient, data, expected) => {
-                expect(data).to.deep.equal("File sent successfully");
+                expect(data).to.deep.equal("Upload successful");
 
                 ftpClient.on("ready", function () {
                     ftpClient.get(connectionConfig.remoteFilePath, (err, stream) => {
@@ -87,11 +85,11 @@ describe("SYSTEM TESTS - ftp.js", function () {
         it("should reject if the server throws an error", function (done) {
             // we don't allow anonymous login
             const connectionConfig = {
-                "host": "127.0.0.1",
+                "host": "ftp-server",
                 "port": 21,
                 "remoteFilePath": "/ftp/user/some_file.txt",
-                "user": "",
-                "password": ""
+                "user": "user",
+                "password": "password"
             };
 
             const readable = new Readable();
@@ -100,7 +98,7 @@ describe("SYSTEM TESTS - ftp.js", function () {
 
             fork
                 (err => {
-                    expect(err).to.deep.equal('Put to FTP failed with error: Error: Permission denied.')
+                    expect(err).to.deep.equal('Upload failed: Error: Permission denied.')
                     done();
                 })
                 (done)
@@ -108,9 +106,9 @@ describe("SYSTEM TESTS - ftp.js", function () {
         });
 
         after(function () {
-            const ftpForTeardown = new ftp();
-            cleanUpFtp(ftpForTeardown);
-            ftpForTeardown.end();
+            // const ftpForTeardown = new ftp();
+            // cleanUpFtp(ftpForTeardown);
+            // ftpForTeardown.end();
             // tearDownDocker();
         });
 

@@ -25,7 +25,7 @@ const setupDocker = () => {
 
 const tearDownDocker = () => {
   console.log(containerId);
-  execSync("docker kill " + containerId);
+  execSync("docker kill" + containerId);
   // execSync("docker ps -q --filter ancestor=ftp-test", options);
 }
 

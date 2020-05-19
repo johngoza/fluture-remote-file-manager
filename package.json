@@ -4,7 +4,8 @@
   "description": "Future returning, easy way of sending files.",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV='development' mocha --recursive tests"
+    "test": "NODE_ENV='development' mocha --recursive tests/unit",
+    "system-test": "NODE_ENV='development' mocha --recursive tests/system"
   },
   "repository": {
     "type": "git",

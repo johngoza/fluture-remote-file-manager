@@ -19,7 +19,8 @@ describe("Unit Tests - FTP", function() {
                 "connect" : (connectionconfiguration) => {},
                 "put" : (file, path, err) => {
                     Future.resolve();
-                }
+                },
+                "end" : () => {}
             };
 
             expect(sendFileViaFtp (mockFtpClient) ("") (fakeConnectionConfig)).to.be.instanceOf(Future);
@@ -38,13 +39,14 @@ describe("Unit Tests - FTP", function() {
                 "connect" : (connectionconfiguration) => {},
                 "put" : (file, path, callback) => {
                     callback();
-                }
+                },
+                "end" : () => {}
             };
 
             fork
             (done)
             (result => {
-                expect(result).to.equal("File sent successfully");
+                expect(result).to.equal("Upload successful");
                 done();
             })
             (sendFileViaFtp (mockFtpClient) ("") (fakeConnectionConfig))
@@ -63,12 +65,13 @@ describe("Unit Tests - FTP", function() {
                 "connect" : (connectionconfiguration) => {},
                 "put" : (file, path, callback) => {
                     callback("put failed");
-                }
+                },
+                "end" : () => {}
             };
 
             fork
             (err => {
-                expect(err).to.equal("Put to FTP failed with error: put failed");
+                expect(err).to.equal("Upload failed: put failed");
                 done();
             })
             (done)

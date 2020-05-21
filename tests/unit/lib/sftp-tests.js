@@ -1,4 +1,4 @@
-const chai    = require("chai");
+const chai = require("chai");
 const { expect }  = chai;
 const { sendFileViaSftp } = require("../../../lib/sftp.js");
 const Future  = require("fluture");

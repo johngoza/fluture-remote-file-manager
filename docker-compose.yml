@@ -2,6 +2,10 @@ version: "3.8"
 services:
     ftp-server:
        build: ./tests/system/resources/ftp/
+    sftp-server:
+        build: ./tests/system/resources/sftp/
+        ports:
+            - "22:22"
     test-server:
         build: .
         depends_on: 

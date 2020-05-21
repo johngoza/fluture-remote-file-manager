@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV='development' mocha --recursive tests/unit",
-    "system-test": "NODE_ENV='development' mocha --recursive tests/system"
+    "system-test": "NODE_ENV='development' mocha --recursive tests/system",
+    "docker-test": "docker-compose up --build --abort-on-container-exit --exit-code-from test-server"
   },
   "repository": {
     "type": "git",

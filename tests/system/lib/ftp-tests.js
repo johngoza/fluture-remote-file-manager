@@ -4,15 +4,18 @@ const ftp = require("ftp");
 const { fork } = require("fluture");
 const path = require("path");
 const Readable = require('stream').Readable;
-const { setupDocker, tearDownDocker } = require("./docker-setup");
 const { sendFileViaFtp } = require(path.join(__dirname, "../../../lib/ftp.js"))
 
 const cleanUpFtp = ftpClient => {
-    ftpClient.on("ready", function () {
-        ftpClient.delete("/ftp/user/some_file.txt", (err) => {
-            throw err;
-        });
+    ftpClient.on("ready", () => {
+        // todo: figure out why this throws "delete operation failed"
+        ftpClient.delete("/some_file.txt", (err) => {});
+        ftpClient.end();
     });
+
+    ftpClient.on("error", (err) => {
+        console.log(err);
+    })
 
     const connectionConfig = {
         "host": "ftp-server",
@@ -27,13 +30,8 @@ const cleanUpFtp = ftpClient => {
 
 describe("SYSTEM TESTS - ftp.js", function () {
     describe("sendFileViaFtp", function () {
-        before(function (done) {
-            // setupDocker();
-            done();
-        });
-
         it("should put a file on an ftp server", function (done) {
-            this.timeout(30000);
+            this.timeout(5000);
 
             const connectionConfig = {
                 "host": "ftp-server",
@@ -43,27 +41,26 @@ describe("SYSTEM TESTS - ftp.js", function () {
                 "password": "password"
             };
 
-            const readable = new Readable();
-            readable.push("hello world");
-            readable.push(null);
-
             const verifyResults = (ftpClient, data, expected) => {
                 expect(data).to.deep.equal("Upload successful");
 
-                ftpClient.on("ready", function () {
+                let finalVal;
+
+                ftpClient.on("ready", () => {
                     ftpClient.get(connectionConfig.remoteFilePath, (err, stream) => {
                         if (err) throw err;
 
-                        let chunks = [];
+                        const chunks = [];
 
-                        stream.on('data', chunk => chunks.push(chunk));
-                        stream.on('end', () => {
-                            const actualReadable = new Readable();
-                            actualReadable._read = () => { }; // _read is required but you can noop it
-                            actualReadable.push(Buffer.concat(chunks).toString('utf-8'));
-                            actualReadable.push(null);
+                        stream.on("data", (chunk) => {
+                            chunks.push(chunk.toString());
+                        });
 
-                            expect(actualReadable).to.deep.equal(expected);
+                        stream.on("end", () => {
+                            finalVal = chunks.join('');
+
+                            expect(finalVal).to.deep.equal('hello world');
+                            ftpClient.end();
                         });
                     });
                 });
@@ -71,46 +68,45 @@ describe("SYSTEM TESTS - ftp.js", function () {
                 ftpClient.connect(connectionConfig);
             }
 
+            const readable = new Readable();
+
             fork
                 (done)
                 (data => {
-                    const ftpClient = new ftp();
-                    verifyResults(ftpClient, data, readable);
-                    ftpClient.end();
+                    verifyResults(new ftp(), data, readable);
+                    cleanUpFtp(new ftp());
                     done();
                 })
                 (sendFileViaFtp(new ftp())(readable)(connectionConfig))
+
+            readable.push("hello world");
+            readable.push(null);
         });
 
         it("should reject if the server throws an error", function (done) {
-            // we don't allow anonymous login
+            this.timeout(5000);
+
+            // we don't allow anonymous login in test container
             const connectionConfig = {
                 "host": "ftp-server",
                 "port": 21,
                 "remoteFilePath": "/ftp/user/some_file.txt",
-                "user": "user",
-                "password": "password"
+                "user": "",
+                "password": ""
             };
 
             const readable = new Readable();
-            readable.push("hello world");
-            readable.push(null);
 
             fork
                 (err => {
-                    expect(err).to.deep.equal('Upload failed: Error: Permission denied.')
+                    expect(err).to.deep.equal("530 Login incorrect.");
                     done();
                 })
                 (done)
                 (sendFileViaFtp(new ftp())(readable)(connectionConfig))
-        });
 
-        after(function () {
-            // const ftpForTeardown = new ftp();
-            // cleanUpFtp(ftpForTeardown);
-            // ftpForTeardown.end();
-            // tearDownDocker();
+            readable.push("hello world");
+            readable.push(null);
         });
-
     });
 });

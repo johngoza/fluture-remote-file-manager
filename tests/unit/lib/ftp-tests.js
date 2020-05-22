@@ -1,19 +1,19 @@
 const chai = require("chai");
-const { expect } = chai;
-const { sendFileViaFtp } = require("../../../lib/ftp.js");
+const expect = chai;
+const sendFileViaFtp = require("../../../lib/ftp.js");
 const Future = require("fluture");
 const EventEmitter = require("events");
-const { fork } = Future;
+const fork = Future;
 
-describe("Unit Tests - FTP", function () {
-  describe("sendFileViaFtp", function () {
-    it("should return a future", function () {
+describe("Unit Tests - FTP", function() {
+  describe("sendFileViaFtp", function() {
+    it("should return a future", function() {
       const fakeConnectionConfig = {
-        host: "",
-        port: 1,
-        remoteFilePath: "",
-        user: "",
-        password: ""
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "",
+        "user": "",
+        "password": "",
       };
 
       const mockFtpClient = new EventEmitter();
@@ -29,13 +29,13 @@ describe("Unit Tests - FTP", function () {
       expect(sendFileViaFtp(mockFtpClient)("")(fakeConnectionConfig)).to.be.instanceOf(Future);
     });
 
-    it("should resolve with a success message if put succeeds", function (done) {
+    it("should resolve with a success message if put succeeds", function(done) {
       const fakeConnectionConfig = {
-        host: "",
-        port: 1,
-        remoteFilePath: "",
-        user: "",
-        password: ""
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "",
+        "user": "",
+        "password": "",
       };
 
       const mockFtpClient = new EventEmitter();
@@ -57,13 +57,13 @@ describe("Unit Tests - FTP", function () {
       (sendFileViaFtp(mockFtpClient)("")(fakeConnectionConfig));
     });
 
-    it("should reject if file send fails", function (done) {
+    it("should reject if file send fails", function(done) {
       const fakeConnectionConfig = {
-        host: "",
-        port: 1,
-        remoteFilePath: "",
-        user: "",
-        password: ""
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "",
+        "user": "",
+        "password": "",
       };
 
       const mockFtpClient = new EventEmitter();
@@ -72,7 +72,7 @@ describe("Unit Tests - FTP", function () {
       };
       mockFtpClient.on("ready", () => { });
       mockFtpClient.put = (f, p, cb) => {
-        mockFtpClient.emit("error", { code: "503", message: "put failed" });
+        mockFtpClient.emit("error", {"code": "503", "message": "put failed"});
       };
       mockFtpClient.end = () => { };
 

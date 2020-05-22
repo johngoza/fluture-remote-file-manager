@@ -1,10 +1,10 @@
 const chai = require("chai");
 const expect = chai.expect;
 const Ftp = require("ftp");
-const { fork } = require("fluture");
+const {fork} = require("fluture");
 const path = require("path");
 const Readable = require("stream").Readable;
-const { sendFileViaFtp } = require(path.join(__dirname, "../../../lib/ftp.js"));
+const {sendFileViaFtp} = require(path.join(__dirname, "../../../lib/ftp.js"));
 
 const cleanUpFtp = ftpClient => {
   ftpClient.on("ready", () => {
@@ -18,27 +18,27 @@ const cleanUpFtp = ftpClient => {
   });
 
   const connectionConfig = {
-    host: "ftp-server",
-    port: 21,
-    remoteFilePath: "/ftp/user/some_file.txt",
-    user: "user",
-    password: "password"
+    "host": "ftp-server",
+    "port": 21,
+    "remoteFilePath": "/ftp/user/some_file.txt",
+    "user": "user",
+    "password": "password",
   };
 
   ftpClient.connect(connectionConfig);
 };
 
-describe("SYSTEM TESTS - ftp.js", function () {
-  describe("sendFileViaFtp", function () {
-    it("should put a file on an ftp server", function (done) {
+describe("SYSTEM TESTS - ftp.js", function() {
+  describe("sendFileViaFtp", function() {
+    it("should put a file on an ftp server", function(done) {
       this.timeout(5000);
 
       const connectionConfig = {
-        host: "ftp-server",
-        port: 21,
-        remoteFilePath: "/ftp/user/some_file.txt",
-        user: "user",
-        password: "password"
+        "host": "ftp-server",
+        "port": 21,
+        "remoteFilePath": "/ftp/user/some_file.txt",
+        "user": "user",
+        "password": "password",
       };
 
       const verifyResults = (ftpClient, data, expected) => {
@@ -83,16 +83,16 @@ describe("SYSTEM TESTS - ftp.js", function () {
       readable.push(null);
     });
 
-    it("should reject if the server throws an error", function (done) {
+    it("should reject if the server throws an error", function(done) {
       this.timeout(5000);
 
       // we don't allow anonymous login in test container
       const connectionConfig = {
-        host: "ftp-server",
-        port: 21,
-        remoteFilePath: "/ftp/user/some_file.txt",
-        user: "",
-        password: ""
+        "host": "ftp-server",
+        "port": 21,
+        "remoteFilePath": "/ftp/user/some_file.txt",
+        "user": "",
+        "password": "",
       };
 
       const readable = new Readable();

@@ -1,10 +1,10 @@
 const chai = require("chai");
 const expect = chai.expect;
 const SftpClient = require("ssh2").Client;
-const { fork } = require("fluture");
+const {fork} = require("fluture");
 const path = require("path");
 const Readable = require("stream").Readable;
-const { sendFileViaSftp } = require(path.join(__dirname, "../../../lib/sftp.js"));
+const {sendFileViaSftp} = require(path.join(__dirname, "../../../lib/sftp.js"));
 
 const cleanUpSftp = (connectionConfig) => {
   const client = new SftpClient();
@@ -30,15 +30,15 @@ const cleanUpSftp = (connectionConfig) => {
   }).connect(connectionConfig);
 };
 
-describe("SYSTEM TESTS - sftp.js", function () {
-  describe("sendFileViaSftp", function () {
-    it("should put a file on an sftp server", function (done) {
+describe("SYSTEM TESTS - sftp.js", function() {
+  describe("sendFileViaSftp", function() {
+    it("should put a file on an sftp server", function(done) {
       const connectionConfig = {
-        host: "sftp-server",
-        port: 22,
-        remoteFilePath: "some_file.txt",
-        user: "user",
-        password: "password"
+        "host": "sftp-server",
+        "port": 22,
+        "remoteFilePath": "some_file.txt",
+        "user": "user",
+        "password": "password",
       };
 
       const readable = new Readable();
@@ -57,14 +57,14 @@ describe("SYSTEM TESTS - sftp.js", function () {
       readable.push(null);
     });
 
-    it("should fail with a descritive message if there is an error", function (done) {
+    it("should fail with a descritive message if there is an error", function(done) {
       // anonymous login not allowed in test sftp server
       const connectionConfig = {
-        host: "sftp-server",
-        port: 22,
-        remoteFilePath: "some_file.txt",
-        user: "",
-        password: ""
+        "host": "sftp-server",
+        "port": 22,
+        "remoteFilePath": "some_file.txt",
+        "user": "",
+        "password": "",
       };
 
       const readable = new Readable();
@@ -81,13 +81,13 @@ describe("SYSTEM TESTS - sftp.js", function () {
       readable.push(null);
     });
 
-    after(function (done) {
+    after(function(done) {
       const connectionConfig = {
-        host: "sftp-server",
-        port: 22,
-        remoteFilePath: "some_file.txt",
-        user: "user",
-        password: "password"
+        "host": "sftp-server",
+        "port": 22,
+        "remoteFilePath": "some_file.txt",
+        "user": "user",
+        "password": "password",
       };
 
       try {

@@ -1,7 +1,7 @@
 const $ = require("sanctuary-def");
-const { FutureType } = require("fluture-sanctuary-types");
-const { def, FtpConnectionConfig } = require("./sanctuaryEnvironment");
-const { Future } = require("fluture");
+const {FutureType} = require("fluture-sanctuary-types");
+const {def, FtpConnectionConfig} = require("./sanctuaryEnvironment");
+const {Future} = require("fluture");
 const FtpClient = require("ftp");
 var SftpClient = require("ssh2").Client;
 const sendFileViaFtp = require("./lib/ftp");

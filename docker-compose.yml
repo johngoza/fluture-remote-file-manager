@@ -2,8 +2,12 @@ version: "3.8"
 services:
     ftp-server:
        build: ./tests/system/resources/ftp/
+       logging:
+        driver: none
     sftp-server:
         build: ./tests/system/resources/sftp/
+        logging:
+            driver: none
     test-server:
         build: .
         depends_on: 

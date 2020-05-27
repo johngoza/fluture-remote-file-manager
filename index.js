@@ -1,22 +1,33 @@
 const $ = require("sanctuary-def");
+const R = require("ramda");
+const fs = require("fs");
 const {FutureType} = require("fluture-sanctuary-types");
-const {def, FtpConnectionConfig} = require("./sanctuaryEnvironment");
-const {Future} = require("fluture");
-const FtpClient = require("ftp");
-const SftpClient = require("ssh2").Client;
-const sendFileViaFtp = require("./lib/ftp");
-const sendFileViaSftp = require("./lib/sftp");
+const {def, FtpConnectionConfig} = require("./lib/sanctuary-environment.js");
+const {reject} = require("fluture");
+const {createReadStream, sendFunctions} = require("./lib/utility-functions");
 
-def("sendFile")
+const forwardToSendMethod = def("forwardToSendMethod")
 ({})
-([$.String, $.Unknown, FtpConnectionConfig, FutureType($.String)($.String)])
-(sendMethod => readStream => connectionConfig => Future((reject, resolve) => {
-  switch (sendMethod) {
-    case "ftp":
-      return sendFileViaFtp(new FtpClient(), readStream, connectionConfig);
-    case "sftp":
-      return sendFileViaSftp(new SftpClient(), readStream, connectionConfig);
-    default:
-      reject("Send method not implemented");
-  }
-}));
+([$.String, $.Unknown, FtpConnectionConfig, $.Unknown, FutureType ($.String) ($.String)])
+(sendMethod => readStream => connectionConfig => sendFunctions => {
+  const methodLens = R.lensPath([sendMethod, "method"]);
+  const sendingFunction = R.view(methodLens, sendFunctions);
+  const clientLens = R.lensPath([sendMethod, "client"]);
+  const client = R.view(clientLens, sendFunctions);
+
+  const err = "Send function not available";
+
+  return R.isNil(sendingFunction)
+    ? reject(err)
+    : sendingFunction(client)(readStream)(connectionConfig);
+});
+
+const sendFile = def("sendFile")
+({})
+([$.String, $.String, $.Unknown, FutureType($.String)($.String)])
+(sendMethod => fileName => connectionConfig => forwardToSendMethod(sendMethod) (createReadStream(fs, fileName)) (connectionConfig) (sendFunctions));
+
+module.exports = {
+  forwardToSendMethod,
+  sendFile,
+};

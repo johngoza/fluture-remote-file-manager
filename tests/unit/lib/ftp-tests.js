@@ -1,9 +1,8 @@
-const chai = require("chai");
-const expect = chai;
-const sendFileViaFtp = require("../../../lib/ftp.js");
+const {expect} = require("chai");
+const {sendFileViaFtp} = require("../../../lib/ftp.js");
 const Future = require("fluture");
 const EventEmitter = require("events");
-const fork = Future;
+const {fork} = Future;
 
 describe("Unit Tests - FTP", function() {
   describe("sendFileViaFtp", function() {

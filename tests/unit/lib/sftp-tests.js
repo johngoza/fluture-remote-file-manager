@@ -1,5 +1,5 @@
 const {expect} = require("chai");
-const sendFileViaSftp = require("../../../lib/sftp.js");
+const {sendFileViaSftp} = require("../../../lib/sftp.js");
 const {Future, fork} = require("fluture");
 const EventEmitter = require("events");
 const {Readable, PassThrough} = require("stream");

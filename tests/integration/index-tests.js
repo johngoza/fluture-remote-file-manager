@@ -37,7 +37,7 @@ describe("Integration Tests", function() {
       readable.push("hello world");
       readable.push(null);
 
-      const forkableFunction = forwardToSendMethod ("ftp") (readable) (mockConnectionConfig) (mockSendFunctions);
+      const forkableFunction = forwardToSendMethod ("ftp") (mockConnectionConfig) (mockSendFunctions) (readable);
 
       fork
       (err => {
@@ -88,7 +88,7 @@ describe("Integration Tests", function() {
       readable.push("hello world");
       readable.push(null);
 
-      const forkableFunction = forwardToSendMethod ("sftp") (readable) (mockConnectionConfig) (mockSendFunctions);
+      const forkableFunction = forwardToSendMethod ("sftp") (mockConnectionConfig) (mockSendFunctions) (readable);
 
       fork
       (err => {
@@ -123,7 +123,7 @@ describe("Integration Tests", function() {
       };
       mockFtpClient.end = () => { };
 
-      const forkableFunction = sendFile ("ftp") ("tests/unit/resources/hello.txt") (mockConnectionConfig);
+      const forkableFunction = sendFile ("ftp") (mockConnectionConfig) ("tests/unit/resources/hello.txt");
 
       fork
       (err => {
@@ -146,11 +146,11 @@ describe("Integration Tests", function() {
         "password": "",
       };
 
-      const forkableFunction = sendFile ("sftp") ("tests/unit/resources/hello.txt") (mockConnectionConfig);
+      const forkableFunction = sendFile ("sftp") (mockConnectionConfig) ("tests/unit/resources/hello.txt");
 
       fork
       (err => {
-        // error mean we got to the ftp client successfully
+        // error means we got to the sftp client successfully
         expect(err.toString()).to.deep.equal("Error: connect ECONNREFUSED 127.0.0.1:1");
         done();
       })

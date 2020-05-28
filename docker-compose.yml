@@ -4,6 +4,8 @@ services:
        build: ./tests/system/resources/ftp/
        logging:
         driver: none
+    ftps-server:
+        build: ./tests/system/resources/ftps/
     sftp-server:
         build: ./tests/system/resources/sftp/
         logging:
@@ -12,4 +14,5 @@ services:
         build: .
         depends_on: 
             - ftp-server
+            - ftps-server
             - sftp-server

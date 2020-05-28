@@ -25,6 +25,12 @@ const forwardToSendMethod = def("forwardToSendMethod")
 const sendFile = def("sendFile")
 ({})
 ([$.String, FtpConnectionConfig, $.Unknown, $.Unknown])
+// (sendMethod => connectionConfig => fileName => {
+//   R.pipe(
+//     createReadStream(fs),
+//     chain (forwardToSendMethod(sendMethod) (connectionConfig) (sendFunctions))
+//   ) (fileName);
+// });
 (sendMethod => connectionConfig => fileName => {
   return chain (forwardToSendMethod(sendMethod) (connectionConfig) (sendFunctions)) (createReadStream(fs, fileName));
 });

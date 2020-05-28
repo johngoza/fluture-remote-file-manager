@@ -6,7 +6,7 @@
   "scripts": {
     "test": "NODE_ENV='development' mocha --recursive tests/integration tests/unit",
     "system-test": "docker-compose up --build --abort-on-container-exit --exit-code-from test-server",
-    "system-test-suite": "NODE_ENV='development' mocha --recursive tests/",
+    "system-test-suite": "NODE_ENV='development' mocha --recursive tests/system",
     "lint": "eslint ./"
   },
   "repository": {

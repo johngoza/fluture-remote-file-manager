@@ -7,6 +7,6 @@ COPY ./lib lib
 COPY ./tests/system ./tests/system
 COPY ./tests/unit ./tests/unit
 
-EXPOSE 21 21000-21010
+EXPOSE 21 31 21000-21010
 
 CMD ["npm", "run", "system-test-suite"]

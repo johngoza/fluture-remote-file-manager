@@ -1,19 +1,15 @@
-FROM alpine:3.10
-RUN apk --no-cache add vsftpd
-RUN apk --no-cache add openssl
-RUN apk add --no-cache bash coreutils grep sed
+FROM centos:7
+RUN yum update -y && yum install -y vsftpd && yum install -y openssl
+ADD vsftpd.conf.template /etc/vsftpd/vsftpd.conf
+ADD wrap_vsftpd.sh /bin/
 
-COPY cert.conf cert.conf
-COPY ftps_keygen.sh ftps_keygen.sh
-RUN chmod +x ftps_keygen.sh
-RUN /bin/bash ftps_keygen.sh
+# This is for our listen port and the passive port range.
+# If the defaults are not good enough for you, set these variables
+# when creating your container using --env or --env-file
+ENV PASV_MIN="21000" PASV_MAX="21010" LISTEN="21" FTPUSER="user" FTPPASS="password"
 
-# RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.key -out /etc/ssl/certs/vsftpd.crt -subj "/C=SM/ST=somecountry/L=location/O=someorg/OU=somedept/CN=localhost"
+# Execute the wrapper which will create the certificate and
+# users for us. Please read the script to understand how it works
+CMD ["wrap_vsftpd.sh"]
 
-COPY start_ftps.sh /bin/start_ftps.sh
-COPY ftps.conf /etc/vsftpd/vsftpd.conf
-
-EXPOSE 21 21000-21010
-RUN chmod +x /bin/start_ftps.sh
-
-ENTRYPOINT ["/bin/start_ftps.sh"]
+EXPOSE ${PASV_MIN}-${PASV_MAX} ${LISTEN}

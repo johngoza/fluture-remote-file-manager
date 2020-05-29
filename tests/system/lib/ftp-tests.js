@@ -14,7 +14,10 @@ const cleanUpFtp = ftpClient => {
   });
 
   ftpClient.on("error", (err) => {
+    ftpClient.end();
+    console.log("an error occurred in the after function");
     console.log(err);
+    throw err;
   });
 
   const connectionConfig = {

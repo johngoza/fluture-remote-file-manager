@@ -14,56 +14,70 @@ const cleanUpFtp = ftpClient => {
   });
 
   ftpClient.on("error", (err) => {
+    ftpClient.end();
+    console.log("an error occurred in the after function");
     console.log(err);
+    throw err;
   });
 
   const connectionConfig = {
     "host": "ftps-server",
-    "port": 31,
-    "remoteFilePath": "/ftp/user/some_file.txt",
+    "port": 21,
     "user": "user",
     "password": "password",
+    "secure": true,
+    "secureOptions": {"rejectUnauthorized": false},
   };
 
   ftpClient.connect(connectionConfig);
 };
 
-describe("SYSTEM TESTS - ftp.js", function() {
-  describe("sendFileViaFtp", function() {
-    it("should put a file on an ftp server", function(done) {
+describe("SYSTEM TESTS - ftps.js", function() {
+  describe("sendFileViaFtps", function() {
+    it("should put a file on an ftps server", function(done) {
       this.timeout(5000);
 
       const connectionConfig = {
         "host": "ftps-server",
-        "port": 31,
-        "remoteFilePath": "/ftp/user/some_file.txt",
+        "port": 21,
+        "remoteFilePath": "/some_file.txt",
         "user": "user",
         "password": "password",
         "secure": true,
         "secureOptions": {"rejectUnauthorized": false},
       };
 
-      const verifyResults = (ftpClient, data, expected) => {
-        expect(data).to.deep.equal("Upload successful");
-
+      const verifyResults = (data) => {
         let finalVal;
+        const ftpClient = new Ftp();
+
+        ftpClient.on("error", (err) => {
+          throw err;
+        });
+
+        ftpClient.on("end", () => {
+        });
 
         ftpClient.on("ready", () => {
           ftpClient.get(connectionConfig.remoteFilePath, (err, stream) => {
-            if (err) throw err;
+            if (err) {
+              done(err);
+            } else {
+              const chunks = [];
 
-            const chunks = [];
+              stream.on("data", (chunk) => {
+                chunks.push(chunk.toString());
+                stream.destroy();
+              });
 
-            stream.on("data", (chunk) => {
-              chunks.push(chunk.toString());
-            });
+              stream.on("end", () => {
+                finalVal = chunks.join("");
 
-            stream.on("end", () => {
-              finalVal = chunks.join("");
-
-              expect(finalVal).to.deep.equal("hello world");
-              ftpClient.end();
-            });
+                expect(finalVal).to.deep.equal("hello world");
+                ftpClient.destroy();
+                done();
+              });
+            }
           });
         });
 
@@ -75,26 +89,26 @@ describe("SYSTEM TESTS - ftp.js", function() {
       fork
       (done)
       (data => {
-        verifyResults(new Ftp(), data, readable);
-        cleanUpFtp(new Ftp());
-        done();
+        verifyResults(data);
       })
       (sendFileViaFtp(new Ftp())(readable)(connectionConfig));
 
       readable.push("hello world");
       readable.push(null);
+      readable.destroy();
+      cleanUpFtp(new Ftp());
     });
 
-    it("should reject if the server throws an error", function(done) {
+    it("should reject if the ftps server throws an error", function(done) {
       this.timeout(5000);
 
-      // we don't allow anonymous login in test container
+      // no password will fail every time
       const connectionConfig = {
         "host": "ftps-server",
-        "port": 31,
-        "remoteFilePath": "/ftp/user/some_file.txt",
+        "port": 21,
+        "remoteFilePath": "/some_file.txt",
         "user": "user",
-        "password": "password",
+        "password": "",
         "secure": true,
         "secureOptions": {"rejectUnauthorized": false},
       };
@@ -103,7 +117,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
 
       fork
       (err => {
-        expect(err).to.deep.equal("read ECONNRESET");
+        expect(err).to.deep.equal("530 Login incorrect.");
         done();
       })
       (done)

@@ -6,32 +6,6 @@ const path = require("path");
 const Readable = require("stream").Readable;
 const {sendFileViaFtp} = require(path.join(__dirname, "../../../lib/ftp.js"));
 
-const cleanUpFtp = ftpClient => {
-  ftpClient.on("ready", () => {
-    // todo: figure out why this throws "delete operation failed"
-    ftpClient.delete("/some_file.txt", (err) => {}); // eslint-disable-line handle-callback-err
-    ftpClient.end();
-  });
-
-  ftpClient.on("error", (err) => {
-    ftpClient.end();
-    console.log("an error occurred in the after function");
-    console.log(err);
-    throw err;
-  });
-
-  const connectionConfig = {
-    "host": "ftps-server",
-    "port": 21,
-    "user": "user",
-    "password": "password",
-    "secure": true,
-    "secureOptions": {"rejectUnauthorized": false},
-  };
-
-  ftpClient.connect(connectionConfig);
-};
-
 describe("SYSTEM TESTS - ftps.js", function() {
   describe("sendFileViaFtps", function() {
     it("should put a file on an ftps server", function(done) {
@@ -40,7 +14,7 @@ describe("SYSTEM TESTS - ftps.js", function() {
       const connectionConfig = {
         "host": "ftps-server",
         "port": 21,
-        "remoteFilePath": "/some_file.txt",
+        "remoteFilePath": "/user/some_file.txt",
         "user": "user",
         "password": "password",
         "secure": true,
@@ -96,7 +70,7 @@ describe("SYSTEM TESTS - ftps.js", function() {
       readable.push("hello world");
       readable.push(null);
       readable.destroy();
-      cleanUpFtp(new Ftp());
+      // cleanUpFtp(new Ftp());
     });
 
     it("should reject if the ftps server throws an error", function(done) {
@@ -106,7 +80,7 @@ describe("SYSTEM TESTS - ftps.js", function() {
       const connectionConfig = {
         "host": "ftps-server",
         "port": 21,
-        "remoteFilePath": "/some_file.txt",
+        "remoteFilePath": "/user/some_file.txt",
         "user": "user",
         "password": "",
         "secure": true,

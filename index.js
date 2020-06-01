@@ -2,13 +2,13 @@ const $ = require("sanctuary-def");
 const R = require("ramda");
 const fs = require("fs");
 const {FutureType} = require("fluture-sanctuary-types");
-const {def, FtpConnectionConfig} = require("./lib/sanctuary-environment.js");
+const {def, ConnectionConfig} = require("./lib/sanctuary-environment.js");
 const {reject, chain} = require("fluture");
 const {createReadStream, sendFunctions} = require("./lib/utility-functions");
 
 const forwardToSendMethod = def("forwardToSendMethod")
 ({})
-([$.String, FtpConnectionConfig, $.Unknown, $.Unknown, FutureType ($.String) ($.String)])
+([$.String, ConnectionConfig, $.Unknown, $.Unknown, FutureType ($.String) ($.String)])
 (sendMethod => connectionConfig => sendFunctions => readStream => {
   const methodLens = R.lensPath([sendMethod, "method"]);
   const sendingFunction = R.view(methodLens, sendFunctions);
@@ -24,7 +24,7 @@ const forwardToSendMethod = def("forwardToSendMethod")
 
 const sendFile = def("sendFile")
 ({})
-([$.String, FtpConnectionConfig, $.Unknown, $.Unknown])
+([$.String, ConnectionConfig, $.Unknown, $.Unknown])
 // (sendMethod => connectionConfig => fileName => {
 //   R.pipe(
 //     createReadStream(fs),

@@ -3,6 +3,7 @@ const {sendFileViaFtp} = require("../../../lib/ftp.js");
 const Future = require("fluture");
 const EventEmitter = require("events");
 const {fork} = Future;
+const {Readable} = require("stream");
 
 describe("Unit Tests - FTP", function() {
   describe("sendFileViaFtp", function() {
@@ -20,12 +21,12 @@ describe("Unit Tests - FTP", function() {
         mockFtpClient.emit("ready");
       };
       mockFtpClient.on("ready", () => { });
-      mockFtpClient.put = (file, path, callback) => {
+      mockFtpClient.put = () => {
         return "put failed";
       };
       mockFtpClient.end = () => { };
 
-      expect(sendFileViaFtp(mockFtpClient)("")(fakeConnectionConfig)).to.be.instanceOf(Future);
+      expect(sendFileViaFtp(mockFtpClient)(new Readable())(fakeConnectionConfig)).to.be.instanceOf(Future);
     });
 
     it("should resolve with a success message if put succeeds", function(done) {
@@ -53,7 +54,7 @@ describe("Unit Tests - FTP", function() {
         expect(result).to.equal("Upload successful");
         done();
       })
-      (sendFileViaFtp(mockFtpClient)("")(fakeConnectionConfig));
+      (sendFileViaFtp(mockFtpClient)(new Readable())(fakeConnectionConfig));
     });
 
     it("should reject if file send fails", function(done) {
@@ -81,7 +82,7 @@ describe("Unit Tests - FTP", function() {
         done();
       })
       (done)
-      (sendFileViaFtp(mockFtpClient)("")(fakeConnectionConfig));
+      (sendFileViaFtp(mockFtpClient)(new Readable())(fakeConnectionConfig));
     });
   });
 });

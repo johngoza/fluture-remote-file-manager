@@ -15,7 +15,15 @@ describe("Unit Tests - SFTP", function() {
         "password": "",
       };
 
-      expect(sendFileViaSftp({})("")(fakeConnectionConfig)).to.be.instanceOf(Future);
+      // this is required for sanctuary type checking
+      const mockSftpClient = {
+        "connect": (ConnectionConfig) => {},
+        "end": (string, func) => {},
+        "on": () => {},
+        "sftp": (func) => {},
+      };
+
+      expect(sendFileViaSftp(mockSftpClient)(new Readable())(fakeConnectionConfig)).to.be.instanceOf(Future);
     });
 
     it("should resolve with a success message if put succeeds", function(done) {

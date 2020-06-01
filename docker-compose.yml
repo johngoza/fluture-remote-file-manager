@@ -6,8 +6,6 @@ services:
         driver: none
     ftps-server:
         build: ./tests/system/resources/ftps/
-        volumes: 
-            - ftp-data:/var/ftp/pub
         logging:
             driver: none
     sftp-server:
@@ -20,5 +18,3 @@ services:
             - ftp-server
             - ftps-server
             - sftp-server
-volumes: 
-    ftp-data:

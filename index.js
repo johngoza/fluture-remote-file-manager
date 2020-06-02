@@ -2,13 +2,13 @@ const $ = require("sanctuary-def");
 const R = require("ramda");
 const fs = require("fs");
 const {FutureType} = require("fluture-sanctuary-types");
-const {def, ConnectionConfig} = require("./lib/sanctuary-environment.js");
-const {reject, chain} = require("fluture");
+const {def, ConnectionConfig, ReadStreamType} = require("./lib/sanctuary-environment.js");
+const {reject} = require("fluture");
 const {createReadStream, sendFunctions} = require("./lib/utility-functions");
 
 const forwardToSendMethod = def("forwardToSendMethod")
 ({})
-([$.String, ConnectionConfig, $.Unknown, $.Unknown, FutureType ($.String) ($.String)])
+([$.String, ConnectionConfig, $.Unknown, ReadStreamType, FutureType ($.String) ($.String)])
 (sendMethod => connectionConfig => sendFunctions => readStream => {
   const methodLens = R.lensPath([sendMethod, "method"]);
   const sendingFunction = R.view(methodLens, sendFunctions);
@@ -25,14 +25,8 @@ const forwardToSendMethod = def("forwardToSendMethod")
 const sendFile = def("sendFile")
 ({})
 ([$.String, ConnectionConfig, $.Unknown, $.Unknown])
-// (sendMethod => connectionConfig => fileName => {
-//   R.pipe(
-//     createReadStream(fs),
-//     chain (forwardToSendMethod(sendMethod) (connectionConfig) (sendFunctions))
-//   ) (fileName);
-// });
 (sendMethod => connectionConfig => fileName => {
-  return chain (forwardToSendMethod(sendMethod) (connectionConfig) (sendFunctions)) (createReadStream(fs, fileName));
+  return R.pipe(createReadStream, forwardToSendMethod(sendMethod) (connectionConfig) (sendFunctions)) ((fs, fileName));
 });
 
 module.exports = {

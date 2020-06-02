@@ -7,30 +7,6 @@ const Readable = require("stream").Readable;
 const {sendFileViaSftp} = require(path.join(__dirname, "../../../lib/sftp.js"));
 const fs = require("fs");
 
-const cleanUpSftp = (connectionConfig) => {
-  const client = new SftpClient();
-
-  client.on("error", (err) => {
-    console.log("an error occurred while connecting to sftp client for file cleanup");
-    throw err;
-  });
-
-  client.on("ready", () => {
-    client.sftp((err, sftp) => {
-      if (err) {
-        client.end();
-        throw err;
-      }
-
-      sftp.unlink(connectionConfig.remoteFilePath, (err) => {
-        client.end();
-        throw err;
-      });
-      client.end();
-    });
-  }).connect(connectionConfig);
-};
-
 describe("SYSTEM TESTS - sftp.js", function() {
   describe("sendFileViaSftp", function() {
     it("should put a file on an sftp server that uses password auth", function(done) {
@@ -107,25 +83,6 @@ describe("SYSTEM TESTS - sftp.js", function() {
 
       readable.push("hello world");
       readable.push(null);
-    });
-
-    after(function(done) {
-      const connectionConfig = {
-        "host": "sftp-server",
-        "port": 22,
-        "remoteFilePath": "some_file.txt",
-        "user": "user",
-        "password": "password",
-      };
-
-      try {
-        cleanUpSftp(connectionConfig);
-        done();
-      } catch (err) {
-        console.log("an error occurred in the after function");
-        console.log(err);
-        done(err);
-      }
     });
   });
 });

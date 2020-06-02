@@ -15,7 +15,7 @@ COPY ./host_id_rsa.pub /home/user/.ssh/keys/id_rsa.pub
 RUN cat /home/user/.ssh/keys/id_rsa.pub > /home/user/.ssh/authorized_keys
 RUN chmod -R 700 /home/user/.ssh && chown -R user /home/user/.ssh
 
-COPY sshd.conf /etc/ssh/sshd_config
+COPY sftp.conf /etc/ssh/sshd_config
 
 EXPOSE 22
 

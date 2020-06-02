@@ -6,31 +6,6 @@ const path = require("path");
 const Readable = require("stream").Readable;
 const {sendFileViaFtp} = require(path.join(__dirname, "../../../lib/ftp.js"));
 
-const cleanUpFtp = ftpClient => {
-  ftpClient.on("ready", () => {
-    // todo: figure out why this throws "delete operation failed"
-    ftpClient.delete("/some_file.txt", (err) => {}); // eslint-disable-line handle-callback-err
-    ftpClient.end();
-  });
-
-  ftpClient.on("error", (err) => {
-    ftpClient.end();
-    console.log("an error occurred in the after function");
-    console.log(err);
-    throw err;
-  });
-
-  const connectionConfig = {
-    "host": "ftp-server",
-    "port": 21,
-    "remoteFilePath": "/ftp/user/some_file.txt",
-    "user": "user",
-    "password": "password",
-  };
-
-  ftpClient.connect(connectionConfig);
-};
-
 describe("SYSTEM TESTS - ftp.js", function() {
   describe("sendFileViaFtp", function() {
     it("should put a file on an ftp server", function(done) {
@@ -77,7 +52,6 @@ describe("SYSTEM TESTS - ftp.js", function() {
       (done)
       (data => {
         verifyResults(new Ftp(), data, readable);
-        cleanUpFtp(new Ftp());
         done();
       })
       (sendFileViaFtp(new Ftp())(readable)(connectionConfig));

@@ -1,6 +1,6 @@
 {
   "name": "@q6-enterprises-inc/fluture-file-send",
-  "version": "1.0.0",
+  "version": "0.0.3",
   "description": "Future returning, easy way of sending files.",
   "main": "index.js",
   "scripts": {

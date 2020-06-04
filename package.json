@@ -42,6 +42,7 @@
     "fluture": "12.2.0",
     "fluture-sanctuary-types": "6.0.0",
     "ftp": "0.3.10",
+    "nodemailer": "6.4.8",
     "ramda": "0.27.0",
     "sanctuary": "3.0.0",
     "sanctuary-def": "0.21.1",

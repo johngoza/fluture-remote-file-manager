@@ -1,0 +1,51 @@
+{
+  "name": "@q6-enterprises-inc/fluture-file-send",
+  "version": "0.0.3",
+  "description": "Future returning, easy way of sending files.",
+  "main": "index.js",
+  "scripts": {
+    "test": "NODE_ENV='development' mocha --recursive tests/integration tests/unit",
+    "system-test": "docker-compose up --build --abort-on-container-exit --exit-code-from test-server; docker-compose down -v",
+    "system-test-suite": "NODE_ENV='development' mocha --recursive tests/system",
+    "lint": "eslint ./"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/q6-enterprises-inc/fluture-file-send.git"
+  },
+  "keywords": [
+    "fluture",
+    "ftp",
+    "sftp",
+    "functional",
+    "upload",
+    "file"
+  ],
+  "author": "Q6 Enterprises, Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/q6-enterprises-inc/fluture-file-send/issues"
+  },
+  "homepage": "https://github.com/q6-enterprises-inc/fluture-file-send#readme",
+  "devDependencies": {
+    "chai": "4.2.0",
+    "eslint": "7.0.0",
+    "eslint-config-standard": "14.1.1",
+    "eslint-plugin-import": "2.20.2",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-promise": "4.2.1",
+    "eslint-plugin-standard": "4.0.1",
+    "mocha": "7.1.1",
+    "nyc": "15.0.1"
+  },
+  "dependencies": {
+    "fluture": "12.2.0",
+    "fluture-sanctuary-types": "6.0.0",
+    "ftp": "0.3.10",
+    "ramda": "0.27.0",
+    "sanctuary": "3.0.0",
+    "sanctuary-def": "0.21.1",
+    "sanctuary-type-classes": "12.1.0",
+    "ssh2": "0.8.9"
+  }
+}

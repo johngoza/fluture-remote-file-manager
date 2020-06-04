@@ -1,7 +1,7 @@
-const {expect} = require("chai");
 const fs = require("fs");
-const {fork} = require("fluture");
 const {createReadStream} = require("../../../lib/utility-functions.js");
+const {expect} = require("chai");
+const {fork} = require("fluture");
 
 describe("Unit Tests - UtilityFunctions", function() {
   describe("createReadStream", function() {

@@ -1,10 +1,10 @@
 const $ = require("sanctuary-def");
-const R = require("ramda");
 const fs = require("fs");
-const {FutureType} = require("fluture-sanctuary-types");
-const {def, ConnectionConfig, ReadStreamType} = require("./lib/sanctuary-environment.js");
+const R = require("ramda");
 const {chain, reject} = require("fluture");
 const {createReadStream, sendFunctions} = require("./lib/utility-functions.js");
+const {def, ConnectionConfig, ReadStreamType} = require("./lib/sanctuary-environment.js");
+const {FutureType} = require("fluture-sanctuary-types");
 
 const forwardToSendMethod = def("forwardToSendMethod")
 ({})

@@ -1,8 +1,8 @@
+const EventEmitter = require("events");
 const {expect} = require("chai");
 const {fork} = require("fluture");
 const {forwardToSendMethod, sendFile} = require("../../index.js");
 const {Readable, PassThrough} = require("stream");
-const EventEmitter = require("events");
 const {sendFileViaFtp} = require("../../lib/ftp.js");
 const {sendFileViaSftp} = require("../../lib/sftp.js");
 
@@ -190,6 +190,5 @@ describe("Integration Tests", function() {
       (done)
       (forkableFunction);
     });
-
   });
 });

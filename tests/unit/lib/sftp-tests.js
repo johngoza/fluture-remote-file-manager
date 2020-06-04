@@ -1,8 +1,8 @@
-const {expect} = require("chai");
-const {sendFileViaSftp} = require("../../../lib/sftp.js");
-const {Future, fork} = require("fluture");
 const EventEmitter = require("events");
+const {expect} = require("chai");
+const {Future, fork} = require("fluture");
 const {Readable, PassThrough} = require("stream");
+const {sendFileViaSftp} = require("../../../lib/sftp.js");
 
 describe("Unit Tests - SFTP", function() {
   describe("sendFileViaSftp", function() {

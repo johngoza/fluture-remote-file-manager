@@ -1,11 +1,11 @@
 const chai = require("chai");
 const expect = chai.expect;
-const SftpClient = require("ssh2").Client;
-const {fork} = require("fluture");
+const fs = require("fs");
 const path = require("path");
 const Readable = require("stream").Readable;
+const SftpClient = require("ssh2").Client;
+const {fork} = require("fluture");
 const {sendFileViaSftp} = require(path.join(__dirname, "../../../lib/sftp.js"));
-const fs = require("fs");
 
 describe("SYSTEM TESTS - sftp.js", function() {
   describe("sendFileViaSftp", function() {

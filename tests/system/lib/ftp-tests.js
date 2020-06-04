@@ -1,9 +1,9 @@
 const chai = require("chai");
 const expect = chai.expect;
 const Ftp = require("ftp");
-const {fork} = require("fluture");
 const path = require("path");
 const Readable = require("stream").Readable;
+const {fork} = require("fluture");
 const {sendFileViaFtp} = require(path.join(__dirname, "../../../lib/ftp.js"));
 
 describe("SYSTEM TESTS - ftp.js", function() {

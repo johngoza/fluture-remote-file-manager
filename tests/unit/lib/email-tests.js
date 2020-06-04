@@ -8,45 +8,62 @@ const {Readable} = require("stream");
 describe("Unit Tests - Email", function() {
   describe("sendFileViaEmail", function() {
     it("should return a future", function() {
-      const fakeConnectionConfig = {
+      const mockMessage = {
+        "to": "",
+        "from": "",
+        "subject": "",
+        "text": "",
+      };
+
+      const mockConfig = {
         "host": "",
         "port": 1,
         "remoteFilePath": "",
-        "user": "",
-        "password": "",
+        "auth": {
+          "user": "",
+          "pass": "",
+        },
+        "message": mockMessage,
       };
 
-      const mockEmailClient = new EventEmitter();
-      mockEmailClient.connect = (connectionconfiguration) => {
-        mockEmailClient.emit("ready");
+      const mockTransport = new EventEmitter();
+      mockTransport.sendMail = (message) => {
+        console.log(message);
+        return "sent successfully!";
       };
-      mockEmailClient.on("ready", () => { });
-      mockEmailClient.put = () => {
-        return "put failed";
+      const mockEmailClient = {
+        "createTransport": (config) => { return mockTransport; },
       };
-      mockEmailClient.end = () => { };
 
-      expect(sendFileViaEmail(mockEmailClient)(new Readable())(fakeConnectionConfig)).to.be.instanceOf(Future);
+      expect(sendFileViaEmail(mockEmailClient)(new Readable())(mockConfig)).to.be.instanceOf(Future);
     });
 
-    it("should resolve with a success message if put succeeds", function(done) {
-      const fakeConnectionConfig = {
+    it("should resolve with a success message if the email sends", function(done) {
+      const mockMessage = {
+        "to": "",
+        "from": "",
+        "subject": "",
+        "text": "",
+      };
+
+      const mockConfig = {
         "host": "",
         "port": 1,
         "remoteFilePath": "",
-        "user": "",
-        "password": "",
+        "auth": {
+          "user": "",
+          "pass": "",
+        },
+        "message": mockMessage,
       };
 
-      const mockEmailClient = new EventEmitter();
-      mockEmailClient.connect = (connectionconfiguration) => {
-        mockEmailClient.emit("ready");
+      const mockTransport = new EventEmitter();
+      mockTransport.sendMail = (message, cb) => {
+        cb(null, "Upload successful");
       };
-      mockEmailClient.on("ready", () => { });
-      mockEmailClient.put = (file, path, callback) => {
-        callback();
+      const mockEmailClient = {
+        "createTransport": (config) => { return mockTransport; },
       };
-      mockEmailClient.end = () => { };
 
       fork
       (done)
@@ -54,35 +71,50 @@ describe("Unit Tests - Email", function() {
         expect(result).to.equal("Upload successful");
         done();
       })
-      (sendFileViaEmail(mockEmailClient)(new Readable())(fakeConnectionConfig));
+      (sendFileViaEmail(mockEmailClient)(new Readable())(mockConfig));
     });
 
-    it("should reject if file send fails", function(done) {
-      const fakeConnectionConfig = {
+    it("should reject if the email sending fails", function(done) {
+      const mockMessage = {
+        "to": "",
+        "from": "",
+        "subject": "",
+        "text": "",
+      };
+
+      const mockConfig = {
         "host": "",
         "port": 1,
         "remoteFilePath": "",
-        "user": "",
-        "password": "",
+        "auth": {
+          "user": "",
+          "pass": "",
+        },
+        "message": mockMessage,
       };
 
-      const mockEmailClient = new EventEmitter();
-      mockEmailClient.connect = (connectionconfiguration) => {
-        mockEmailClient.emit("ready");
+      const invalidLoginError = {
+        "code": "EAUTH",
+        "message": "Invalid login: 535 5.7.8 Sorry.",
       };
-      mockEmailClient.on("ready", () => { });
-      mockEmailClient.put = (f, p, cb) => {
-        mockEmailClient.emit("error", {"code": "503", "message": "put failed"});
+
+      const mockTransport = new EventEmitter();
+      mockTransport.sendMail = (message, cb) => {
+        cb(invalidLoginError, null);
       };
-      mockEmailClient.end = () => { };
+      const mockEmailClient = {
+        "createTransport": (config) => { return mockTransport; },
+      };
+
+      const expectedResult = invalidLoginError.code + " " + invalidLoginError.message;
 
       fork
       (err => {
-        expect(err).to.equal("503 put failed");
+        expect(err).to.equal(expectedResult);
         done();
       })
       (done)
-      (sendFileViaEmail(mockEmailClient)(new Readable())(fakeConnectionConfig));
+      (sendFileViaEmail(mockEmailClient)(new Readable())(mockConfig));
     });
   });
 });

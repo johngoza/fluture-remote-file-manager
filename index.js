@@ -24,7 +24,7 @@ const forwardToSendMethod = def("forwardToSendMethod")
 
 const sendFile = def("sendFile")
 ({})
-([$.String, ConnectionConfig, $.Unknown, $.Unknown])
+([$.String, ConnectionConfig, $.String, $.Unknown])
 (sendMethod => connectionConfig => fileName => {
   return chain (forwardToSendMethod(sendMethod) (connectionConfig) (sendFunctions)) (createReadStream(fs, fileName));
 });

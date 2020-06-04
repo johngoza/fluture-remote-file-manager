@@ -105,7 +105,7 @@ describe("Integration Tests", function() {
   });
 
   describe("sendFile", function() {
-    it("should send to ftp", function(done) {
+    it("should reject with error from ftp if ftp client throws error", function(done) {
       const mockConnectionConfig = {
         "host": "",
         "port": 1,
@@ -159,5 +159,37 @@ describe("Integration Tests", function() {
       })
       (forkableFunction);
     });
+
+    it("should route to email", function(done) {
+      const mockMessage = {
+        "to": "",
+        "from": "",
+        "subject": "",
+        "text": "",
+      };
+
+      const mockConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "",
+        "auth": {
+          "user": "",
+          "pass": "",
+        },
+        "message": mockMessage,
+      };
+
+      const forkableFunction = sendFile ("email") (mockConfig) ("tests/unit/resources/hello.txt");
+
+      fork
+      (err => {
+        // error means we got to the mail client successfully
+        expect(err.toString()).to.deep.equal("ESOCKET connect ECONNREFUSED 127.0.0.1:1");
+        done();
+      })
+      (done)
+      (forkableFunction);
+    });
+
   });
 });

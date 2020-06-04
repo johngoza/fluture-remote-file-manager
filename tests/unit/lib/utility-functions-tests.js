@@ -1,24 +1,9 @@
 const {expect} = require("chai");
 const fs = require("fs");
 const {fork} = require("fluture");
-const {createReadStream, base64EncodeData} = require("../../../lib/utility-functions.js");
+const {createReadStream} = require("../../../lib/utility-functions.js");
 
 describe("Unit Tests - UtilityFunctions", function() {
-  describe("base64EncodeData", function() {
-    it("should correctly encode given data into base64", function(done) {
-      const expectedResult = "aGVsbG8gd29ybGQ=";
-
-      const data = "hello world";
-
-      fork
-      (done)
-      (result => {
-        expect(result).to.equal(expectedResult);
-        done();
-      })
-      (base64EncodeData(data));
-    });
-  });
   describe("createReadStream", function() {
     it("should not break fs read functionality", function(done) {
       const verifyResults = (readStream) => {

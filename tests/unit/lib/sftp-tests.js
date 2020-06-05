@@ -111,5 +111,41 @@ describe("Unit Tests - SFTP", function() {
       (sendFileViaSftp(mockSftpClient)(readable)(fakeConnectionConfig));
       passThrough.emit("error", "SFTP error");
     });
+
+    it("should reject if there is an error getting the sftp client", function(done) {
+      const fakeConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "",
+        "user": "",
+        "password": "",
+      };
+
+      const readable = new Readable();
+      readable.push("hello world");
+      readable.push(null);
+
+      const mockSftpClient = new EventEmitter();
+      const mockError = "Error constructing SFTP";
+
+      mockSftpClient.sftp = (cb) => {
+        cb(mockError, null);
+      };
+      mockSftpClient.connect = () => {
+        mockSftpClient.emit("ready");
+      };
+      mockSftpClient.on("ready", () => {});
+      mockSftpClient.end = () => {};
+
+      const verifyResult = err => {
+        expect(err).to.equal(mockError);
+        done();
+      };
+
+      fork
+      (verifyResult)
+      (done)
+      (sendFileViaSftp(mockSftpClient)(readable)(fakeConnectionConfig));
+    });
   });
 });

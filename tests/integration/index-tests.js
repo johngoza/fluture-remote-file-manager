@@ -3,6 +3,7 @@ const {expect} = require("chai");
 const {fork} = require("fluture");
 const {forwardToSendMethod, sendFile} = require("../../index.js");
 const {Readable, PassThrough} = require("stream");
+const {sendFileViaEmail} = require("../../lib/email.js");
 const {sendFileViaFtp} = require("../../lib/ftp.js");
 const {sendFileViaSftp} = require("../../lib/sftp.js");
 
@@ -102,10 +103,84 @@ describe("Integration Tests", function() {
 
       passThrough.emit("close");
     });
+
+    it("should route to email", function(done) {
+      const mockMessage = {
+        "to": "",
+        "from": "",
+        "subject": "",
+        "text": "",
+      };
+
+      const mockConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "",
+        "auth": {
+          "user": "",
+          "pass": "",
+        },
+        "message": mockMessage,
+      };
+
+      const mockTransport = new EventEmitter();
+      mockTransport.sendMail = (message, cb) => {
+        cb(null, "Upload successful");
+      };
+      const mockEmailClient = {
+        "createTransport": (config) => { return mockTransport; },
+      };
+
+      const mockSendFunctions = {
+        "email": {
+          "method": sendFileViaEmail,
+          "client": mockEmailClient,
+        },
+      };
+
+      const forkableFunction = forwardToSendMethod ("email") (mockConfig) (mockSendFunctions) (new Readable());
+
+      fork
+      (done)
+      (data => {
+        expect(data).to.equal("Upload successful");
+        done();
+      })
+      (forkableFunction);
+    });
+
+    it("should reject if an unsupported send method string is provided", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "file.txt",
+        "user": "",
+        "password": "",
+      };
+
+      const mockSendFunctions = {
+        "foo": {
+          "method": "method",
+          "client": "client",
+        },
+      };
+
+      const forkableFunction = forwardToSendMethod ("bar") (mockConnectionConfig) (mockSendFunctions) (new Readable());
+
+      fork
+      (err => {
+        expect(err).to.equal("Send function not available");
+        done();
+      })
+      (data => {
+        done("Expected an error but recieved " + data);
+      })
+      (forkableFunction);
+    });
   });
 
   describe("sendFile", function() {
-    it("should reject with error from ftp if ftp client throws error", function(done) {
+    it("should route to ftp", function(done) {
       const mockConnectionConfig = {
         "host": "",
         "port": 1,

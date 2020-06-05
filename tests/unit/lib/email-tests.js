@@ -28,7 +28,6 @@ describe("Unit Tests - Email", function() {
 
       const mockTransport = new EventEmitter();
       mockTransport.sendMail = (message) => {
-        console.log(message);
         return "sent successfully!";
       };
       const mockEmailClient = {

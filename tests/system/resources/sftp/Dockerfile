@@ -6,6 +6,7 @@ ENV ROOT_PASS=rootpassword
 
 RUN apk add --no-cache bash openssh shadow
 COPY ./host_id_rsa /etc/ssh/ssh_host_rsa_key
+RUN chmod 600 /etc/ssh/ssh_host_rsa_key
 
 RUN useradd -m -s /bin/bash $SSH_USER \
 && echo "$SSH_USER:$SSH_PASS" | chpasswd \

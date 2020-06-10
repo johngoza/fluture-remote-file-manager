@@ -1,0 +1,22 @@
+version: "3.3"
+services:
+  ftp-server:
+    build: ./resources/ftp/
+    logging:
+      driver: none
+  ftps-server:
+    build: ./resources/ftps/
+    logging:
+      driver: none
+  sftp-server:
+    build: ./resources/sftp/
+    logging:
+      driver: none
+  test-server:
+    build:
+      context: ../..
+      dockerfile: ./tests/system/Dockerfile
+    depends_on:
+      - ftp-server
+      - ftps-server
+      - sftp-server

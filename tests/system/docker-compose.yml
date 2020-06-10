@@ -14,7 +14,7 @@ services:
       driver: none
   test-server:
     build:
-      context: ../..
+      context: ../../
       dockerfile: ./tests/system/Dockerfile
     depends_on:
       - ftp-server

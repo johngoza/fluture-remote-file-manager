@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.3"
 services:
     ftp-server:
        build: ./tests/system/resources/ftp/

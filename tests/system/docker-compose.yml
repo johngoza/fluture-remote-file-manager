@@ -1,5 +1,9 @@
 version: "3.3"
 services:
+  email-server:
+    build: ./resources/email/
+    # ports: 
+    #   - "587:587"
   ftp-server:
     build: ./resources/ftp/
     logging:
@@ -17,6 +21,7 @@ services:
       context: ../../
       dockerfile: ./tests/system/Dockerfile
     depends_on:
+      - email-server
       - ftp-server
       - ftps-server
       - sftp-server

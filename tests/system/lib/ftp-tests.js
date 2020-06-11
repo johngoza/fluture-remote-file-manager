@@ -86,6 +86,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
       readable.push(null);
     });
   });
+
   describe("sendFileViaFtps", function() {
     it("should put a file on an ftps server", function(done) {
       this.timeout(5000);
@@ -149,7 +150,6 @@ describe("SYSTEM TESTS - ftp.js", function() {
       readable.push("hello world");
       readable.push(null);
       readable.destroy();
-      // cleanUpFtp(new Ftp());
     });
 
     it("should reject if the ftps server throws an error", function(done) {

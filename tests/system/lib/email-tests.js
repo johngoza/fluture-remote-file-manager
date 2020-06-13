@@ -1,10 +1,14 @@
+const expect = require("chai").expect;
 const NodeMailer = require("nodemailer");
 const path = require("path");
 const Readable = require("stream").Readable;
 const {fork} = require("fluture");
 const {sendFileViaEmail} = require(path.join(__dirname, "../../../lib/email.js"));
-const expect = require("chai").expect;
 
+// The expect wrapped in a try/catch is bad practice
+// but is unfortunately required as smtpserver changes the context
+// inside that block and errors do not report correctly.
+// Do not remove the try/catch.
 describe("SYSTEM TESTS - email.js", function() {
   describe("sendFileViaEmail", function() {
     it("should hit smtp correctly", function(done) {
@@ -36,16 +40,18 @@ describe("SYSTEM TESTS - email.js", function() {
         done(err);
       })
       (data => {
-        console.log(data);
-        // expect(data).to.deep.equal("ashfihasb");
-        done();
+        try {
+          expect(data.response).to.deep.equal("250 accepted");
+          done();
+        } catch (err) {
+          done(err);
+        }
       })
       (sendFileViaEmail(NodeMailer) (readable) (config));
 
       readable.push("hello world");
       readable.push(null);
       readable.emit("end");
-      // readable.destroy();
     });
   });
 });

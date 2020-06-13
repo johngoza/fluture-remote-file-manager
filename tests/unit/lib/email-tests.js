@@ -30,6 +30,7 @@ describe("Unit Tests - Email", function() {
       mockTransport.sendMail = (message) => {
         return "sent successfully!";
       };
+      mockTransport.close = () => {};
       const mockEmailClient = {
         "createTransport": (config) => { return mockTransport; },
       };
@@ -60,6 +61,8 @@ describe("Unit Tests - Email", function() {
       mockTransport.sendMail = (message, cb) => {
         cb(null, "Upload successful");
       };
+      mockTransport.close = () => {};
+
       const mockEmailClient = {
         "createTransport": (config) => { return mockTransport; },
       };
@@ -101,6 +104,8 @@ describe("Unit Tests - Email", function() {
       mockTransport.sendMail = (message, cb) => {
         cb(invalidLoginError, null);
       };
+      mockTransport.close = () => {};
+
       const mockEmailClient = {
         "createTransport": (config) => { return mockTransport; },
       };

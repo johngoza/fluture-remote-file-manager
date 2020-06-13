@@ -127,6 +127,8 @@ describe("Integration Tests", function() {
       mockTransport.sendMail = (message, cb) => {
         cb(null, "Upload successful");
       };
+      mockTransport.close = () => {};
+
       const mockEmailClient = {
         "createTransport": (config) => { return mockTransport; },
       };

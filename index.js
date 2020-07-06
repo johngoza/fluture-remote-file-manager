@@ -1,10 +1,10 @@
 const $ = require("sanctuary-def");
-const R = require("ramda");
 const fs = require("fs");
-const {FutureType} = require("fluture-sanctuary-types");
+const R = require("ramda");
+const {chain, reject} = require("fluture");
+const {createReadStream, sendFunctions} = require("./lib/utility-functions.js");
 const {def, ConnectionConfig, ReadStreamType} = require("./lib/sanctuary-environment.js");
-const {reject} = require("fluture");
-const {createReadStream, sendFunctions} = require("./lib/utility-functions");
+const {FutureType} = require("fluture-sanctuary-types");
 
 const forwardToSendMethod = def("forwardToSendMethod")
 ({})
@@ -24,9 +24,9 @@ const forwardToSendMethod = def("forwardToSendMethod")
 
 const sendFile = def("sendFile")
 ({})
-([$.String, ConnectionConfig, $.Unknown, $.Unknown])
+([$.String, ConnectionConfig, $.String, $.Unknown])
 (sendMethod => connectionConfig => fileName => {
-  return R.pipe(createReadStream, forwardToSendMethod(sendMethod) (connectionConfig) (sendFunctions)) ((fs, fileName));
+  return chain (forwardToSendMethod(sendMethod) (connectionConfig) (sendFunctions)) (createReadStream(fs, fileName));
 });
 
 module.exports = {

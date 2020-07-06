@@ -1,0 +1,12 @@
+{
+  "name": "smtp",
+  "description": "",
+  "version": "1.0.0",
+  "main": "smtp-server.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "smtp-server": "3.6.0"
+  }
+}

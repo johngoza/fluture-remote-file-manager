@@ -15,6 +15,9 @@ module.exports = {
   "parserOptions": {
     "ecmaVersion": 11,
   },
+  "plugins": [
+    "sort-requires",
+  ],
   "rules": {
     "func-call-spacing": "off",
     "space-before-function-paren": ["error", "never"],
@@ -30,5 +33,6 @@ module.exports = {
     "quote-props": ["error", "always"],
     "array-bracket-spacing": ["error", "never"],
     "object-curly-spacing": ["error", "never"],
+    "sort-requires/sort-requires": ["error", "always"],
   },
 };

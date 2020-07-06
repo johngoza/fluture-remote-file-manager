@@ -1,6 +1,6 @@
 {
   "name": "@q6-enterprises-inc/fluture-file-send",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Future returning, easy way of sending files.",
   "main": "index.js",
   "scripts": {
@@ -34,14 +34,17 @@
     "eslint-plugin-import": "2.20.2",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-promise": "4.2.1",
+    "eslint-plugin-sort-requires": "2.1.0",
     "eslint-plugin-standard": "4.0.1",
     "mocha": "7.1.1",
-    "nyc": "15.0.1"
+    "nyc": "15.0.1",
+    "smtp-server": "3.6.0"
   },
   "dependencies": {
     "fluture": "12.2.0",
     "fluture-sanctuary-types": "6.0.0",
     "ftp": "0.3.10",
+    "nodemailer": "6.4.8",
     "ramda": "0.27.0",
     "sanctuary": "3.0.0",
     "sanctuary-def": "0.21.1",

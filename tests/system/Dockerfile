@@ -3,6 +3,7 @@ FROM node:12-alpine
 COPY ./package.json .
 RUN npm install
 
+COPY index.js index.js
 COPY ./lib lib
 COPY ./tests/system ./tests/system
 

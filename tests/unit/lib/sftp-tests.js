@@ -1,8 +1,8 @@
-const {expect} = require("chai");
-const {sendFileViaSftp} = require("../../../lib/sftp.js");
-const {Future, fork} = require("fluture");
 const EventEmitter = require("events");
+const {expect} = require("chai");
+const {Future, fork} = require("fluture");
 const {Readable, PassThrough} = require("stream");
+const {sendFileViaSftp} = require("../../../lib/sftp.js");
 
 describe("Unit Tests - SFTP", function() {
   describe("sendFileViaSftp", function() {
@@ -17,10 +17,10 @@ describe("Unit Tests - SFTP", function() {
 
       // this is required for sanctuary type checking
       const mockSftpClient = {
-        "connect": (ConnectionConfig) => {},
-        "end": (string, func) => {},
+        "connect": () => {},
+        "end": () => {},
         "on": () => {},
-        "sftp": (func) => {},
+        "sftp": () => {},
       };
 
       expect(sendFileViaSftp(mockSftpClient)(new Readable())(fakeConnectionConfig)).to.be.instanceOf(Future);
@@ -110,6 +110,42 @@ describe("Unit Tests - SFTP", function() {
       (done)
       (sendFileViaSftp(mockSftpClient)(readable)(fakeConnectionConfig));
       passThrough.emit("error", "SFTP error");
+    });
+
+    it("should reject if there is an error getting the sftp client", function(done) {
+      const fakeConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "",
+        "user": "",
+        "password": "",
+      };
+
+      const readable = new Readable();
+      readable.push("hello world");
+      readable.push(null);
+
+      const mockSftpClient = new EventEmitter();
+      const mockError = "Error constructing SFTP";
+
+      mockSftpClient.sftp = (cb) => {
+        cb(mockError, null);
+      };
+      mockSftpClient.connect = () => {
+        mockSftpClient.emit("ready");
+      };
+      mockSftpClient.on("ready", () => {});
+      mockSftpClient.end = () => {};
+
+      const verifyResult = err => {
+        expect(err).to.equal(mockError);
+        done();
+      };
+
+      fork
+      (verifyResult)
+      (done)
+      (sendFileViaSftp(mockSftpClient)(readable)(fakeConnectionConfig));
     });
   });
 });

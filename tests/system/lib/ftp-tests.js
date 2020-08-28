@@ -1,12 +1,65 @@
 const chai = require("chai");
 const expect = chai.expect;
+const fs = require("fs");
 const Ftp = require("ftp");
 const path = require("path");
 const Readable = require("stream").Readable;
 const {fork} = require("fluture");
-const {sendFileViaFtp} = require(path.join(__dirname, "../../../lib/ftp.js"));
+const {getFileViaFtp, sendFileViaFtp} = require(path.join(__dirname, "../../../lib/ftp.js"));
 
 describe("SYSTEM TESTS - ftp.js", function() {
+  describe("getFileViaFtp", function() {
+    // todo: this ain't workin. fix the durn thing
+    it("should get a file on an ftp server", function(done) {
+      this.timeout(5000);
+
+      const connectionConfig = {
+        "host": "ftp-server",
+        "port": 21,
+        "remoteFilePath": "/hello.txt",
+        "user": "user",
+        "password": "password",
+      };
+
+      const writable = fs.createWriteStream("my-file.txt");
+
+      fork
+      (done)
+      (data => {
+        const result = fs.readFileSync("my-file.txt", "utf-8");
+        console.log(result);
+        done();
+      })
+      (getFileViaFtp(new Ftp())(writable)(connectionConfig));
+    });
+
+    // it("should reject if the server throws an error", function(done) {
+    //   this.timeout(5000);
+    //
+    //   // we don't allow anonymous login in test container
+    //   const connectionConfig = {
+    //     "host": "ftp-server",
+    //     "port": 21,
+    //     "remoteFilePath": "/ftp/user/some_file.txt",
+    //     "user": "",
+    //     "password": "",
+    //   };
+    //
+    //   const readable = new Readable();
+    //
+    //   fork
+    //   (err => {
+    //     expect(err).to.deep.equal("530 Login incorrect.");
+    //     done();
+    //   })
+    //   (done)
+    //   (getFileViaFtp(new Ftp())(readable)(connectionConfig));
+    //
+    //   readable.push("hello world");
+    //   readable.push(null);
+    // });
+  });
+
   describe("sendFileViaFtp", function() {
     it("should put a file on an ftp server", function(done) {
       this.timeout(5000);

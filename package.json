@@ -1,6 +1,6 @@
 {
-  "name": "@q6-enterprises-inc/fluture-file-send",
-  "version": "0.0.7",
+  "name": "@q6-enterprises-inc/fluture-remote-file-manager",
+  "version": "0.0.8",
   "description": "Future returning, easy way of sending files.",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/q6-enterprises-inc/fluture-file-send.git"
+    "url": "https://github.com/q6-enterprises-inc/fluture-remote-file-manager.git"
   },
   "keywords": [
     "fluture",
@@ -24,9 +24,9 @@
   "author": "Q6 Enterprises, Inc.",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/q6-enterprises-inc/fluture-file-send/issues"
+    "url": "https://github.com/q6-enterprises-inc/fluture-remote-file-manager/issues"
   },
-  "homepage": "https://github.com/q6-enterprises-inc/fluture-file-send#readme",
+  "homepage": "https://github.com/q6-enterprises-inc/fluture-remote-file-manager#readme",
   "devDependencies": {
     "chai": "4.2.0",
     "eslint": "7.0.0",

@@ -3,7 +3,7 @@ const Future = require("fluture");
 const {expect} = require("chai");
 const {getFileViaFtp, sendFileViaFtp} = require("../../../lib/ftp.js");
 const {fork} = Future;
-const {Readable, Writable} = require("stream");
+const {Readable, PassThrough} = require("stream");
 
 describe("Unit Tests - FTP", function() {
   describe("getFileViaFtp", function() {
@@ -17,17 +17,16 @@ describe("Unit Tests - FTP", function() {
       };
 
       const mockFtpClient = new EventEmitter();
-      mockFtpClient.connect = (connectionconfiguration) => {
+      mockFtpClient.connect = (config) => {
         mockFtpClient.emit("ready");
       };
-      mockFtpClient.on("ready", () => { });
       mockFtpClient.put = () => { };
       mockFtpClient.get = () => {
         return "get failed";
       };
       mockFtpClient.end = () => { };
 
-      expect(getFileViaFtp(mockFtpClient)(new Writable())(fakeConnectionConfig)).to.be.instanceOf(Future);
+      expect(getFileViaFtp(mockFtpClient)(new PassThrough())(fakeConnectionConfig)).to.be.instanceOf(Future);
     });
 
     it("should resolve with a success message if get succeeds", function(done) {
@@ -40,13 +39,12 @@ describe("Unit Tests - FTP", function() {
       };
 
       const readable = new Readable();
-      const writable = new Writable();
+      const passthrough = new PassThrough();
 
       const mockFtpClient = new EventEmitter();
-      mockFtpClient.connect = (connectionconfiguration) => {
+      mockFtpClient.connect = (config) => {
         mockFtpClient.emit("ready");
       };
-      mockFtpClient.on("ready", () => { });
       mockFtpClient.put = () => { };
       mockFtpClient.get = (path, callback) => {
         callback(null, readable);
@@ -55,19 +53,25 @@ describe("Unit Tests - FTP", function() {
 
       fork
       (done)
-      (result => {
-        expect(result).to.equal("Upload successful");
-        done();
+      (data => {
+        let result = "";
+
+        data.on("data", function(d) {
+          result += d.toString();
+        });
+
+        data.on("end", function() {
+          expect(result).to.deep.equal("hello world");
+          done();
+        });
       })
-      (getFileViaFtp(mockFtpClient)(writable)(fakeConnectionConfig));
+      (getFileViaFtp(mockFtpClient)(passthrough)(fakeConnectionConfig));
 
       readable.push("hello world");
       readable.push(null);
-
-      writable.emit("close");
     });
 
-    it("should reject if the client throws an error", function(done) {
+    it("should reject if get fails", function(done) {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
@@ -80,7 +84,6 @@ describe("Unit Tests - FTP", function() {
       mockFtpClient.connect = (connectionconfiguration) => {
         mockFtpClient.emit("ready");
       };
-      mockFtpClient.on("ready", () => { });
       mockFtpClient.put = () => { };
       mockFtpClient.get = (p, cb) => {
         mockFtpClient.emit("error", {"code": "503", "message": "get failed"});
@@ -93,38 +96,7 @@ describe("Unit Tests - FTP", function() {
         done();
       })
       (done)
-      (getFileViaFtp(mockFtpClient)(new Writable())(fakeConnectionConfig));
-    });
-
-    it("should reject if get fails", function(done) {
-      const fakeConnectionConfig = {
-        "host": "",
-        "port": 1,
-        "remoteFilePath": "",
-        "user": "",
-        "password": "",
-      };
-
-      const mockedError = {"code": "503", "message": "get failed"};
-
-      const mockFtpClient = new EventEmitter();
-      mockFtpClient.connect = (connectionconfiguration) => {
-        mockFtpClient.emit("ready");
-      };
-      mockFtpClient.on("ready", () => { });
-      mockFtpClient.put = () => { };
-      mockFtpClient.get = (p, cb) => {
-        cb(null, mockedError);
-      };
-      mockFtpClient.end = () => { };
-
-      fork
-      (err => {
-        expect(err).to.equal("503 get failed");
-        done();
-      })
-      (done)
-      (sendFileViaFtp(mockFtpClient)(new Writable())(fakeConnectionConfig));
+      (getFileViaFtp(mockFtpClient)(new PassThrough())(fakeConnectionConfig));
     });
   });
 

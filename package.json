@@ -1,7 +1,7 @@
 {
   "name": "@q6-enterprises-inc/fluture-remote-file-manager",
   "version": "0.0.8",
-  "description": "Future returning, easy way of sending files.",
+  "description": "Future returning, easy way of sending or retrieving files.",
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV='development' mocha --recursive tests/integration tests/unit",

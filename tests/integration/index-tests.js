@@ -19,7 +19,6 @@ describe("Integration Tests", function() {
       };
 
       const readable = new Readable();
-      const passthrough = new PassThrough();
 
       readable.push("hello world");
       readable.push(null);
@@ -41,7 +40,7 @@ describe("Integration Tests", function() {
         },
       };
 
-      const forkableFunction = forwardToGetMethod("ftp")(mockConnectionConfig)(mockSendFunctions)(passthrough);
+      const forkableFunction = forwardToGetMethod("ftp")(mockConnectionConfig)(mockSendFunctions);
 
       fork
       (err => {
@@ -77,8 +76,6 @@ describe("Integration Tests", function() {
       readable.push("hello world");
       readable.push(null);
 
-      const passthrough = new PassThrough();
-
       const mockFtpClient = new EventEmitter();
       mockFtpClient.connect = (config) => {
         mockFtpClient.emit("ready");
@@ -89,7 +86,7 @@ describe("Integration Tests", function() {
       };
       mockFtpClient.end = () => { };
 
-      const forkableFunction = getFile ("ftp") (mockConnectionConfig) (passthrough);
+      const forkableFunction = getFile ("ftp") (mockConnectionConfig);
 
       fork
       (err => {

@@ -24,7 +24,7 @@ const forwardToGetMethod = def("forwardToGetMethod")
 
 const getFile = def("getFile")
 ({})
-([$.String, ConnectionConfig, $.Unknown])
+([$.String, ConnectionConfig, FutureType($.String)($.Any)])
 (getMethod => connectionConfig => {
   return forwardToGetMethod(getMethod) (connectionConfig) (getFunctions);
 });
@@ -47,7 +47,7 @@ const forwardToSendMethod = def("forwardToSendMethod")
 
 const sendFile = def("sendFile")
 ({})
-([$.String, ConnectionConfig, $.String, $.Unknown])
+([$.String, ConnectionConfig, $.String, FutureType($.String)($.String)])
 (sendMethod => connectionConfig => fileName => {
   return chain (forwardToSendMethod(sendMethod) (connectionConfig) (sendFunctions)) (createReadStream(fs, fileName));
 });

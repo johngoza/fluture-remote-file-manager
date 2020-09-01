@@ -5,6 +5,8 @@ const Readable = require("stream").Readable;
 const {fork} = require("fluture");
 const {sendFileViaEmail} = require(path.join(__dirname, "../../../lib/email.js"));
 
+// todo: update existing tests to use index functions rather than directly reference the library
+
 // The expect wrapped in a try/catch is bad practice
 // but is unfortunately required as smtpserver changes the context
 // inside that block and errors do not report correctly.

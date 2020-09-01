@@ -1,13 +1,15 @@
 {
   "name": "@q6-enterprises-inc/fluture-remote-file-manager",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Future returning, easy way of sending or retrieving files.",
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV='development' mocha --recursive tests/integration tests/unit",
+    "silent-test": "NODE_ENV='development' mocha --recursive tests/integration tests/unit > /dev/null",
     "system-test": "./tests/system/system-test.sh",
     "system-test-suite": "NODE_ENV='development' mocha --recursive tests/system",
-    "lint": "eslint ./"
+    "lint": "eslint ./",
+    "coverage": "nyc npm run silent-test"
   },
   "repository": {
     "type": "git",

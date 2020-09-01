@@ -9,6 +9,37 @@ const {sendFileViaEmail} = require("../../lib/email.js");
 
 describe("Integration Tests", function() {
   describe("forwardToGetMethod", function() {
+    it("should reject if the method is not found", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "file.txt",
+        "user": "",
+        "password": "",
+      };
+
+      const mockFtpClient = new EventEmitter();
+      mockFtpClient.connect = () => { };
+      mockFtpClient.put = () => { };
+      mockFtpClient.get = () => { };
+      mockFtpClient.end = () => { };
+
+      const mockGetFunctions = {
+        "ftp": {
+          "method": getFileViaFtp,
+          "client": mockFtpClient,
+        },
+      };
+
+      fork
+      (err => {
+        expect(err).to.deep.equal("Get function not available");
+        done();
+      })
+      (done)
+      (forwardToGetMethod("email")(mockConnectionConfig)(mockGetFunctions));
+    });
+
     it("should route to ftp", function(done) {
       const mockConnectionConfig = {
         "host": "",
@@ -33,14 +64,14 @@ describe("Integration Tests", function() {
       };
       mockFtpClient.end = () => { };
 
-      const mockSendFunctions = {
+      const mockGetFunctions = {
         "ftp": {
           "method": getFileViaFtp,
           "client": mockFtpClient,
         },
       };
 
-      const forkableFunction = forwardToGetMethod("ftp")(mockConnectionConfig)(mockSendFunctions);
+      const forkableFunction = forwardToGetMethod("ftp")(mockConnectionConfig)(mockGetFunctions);
 
       fork
       (err => {
@@ -88,14 +119,14 @@ describe("Integration Tests", function() {
       mockSftpClient.on("ready", () => {});
       mockSftpClient.end = () => {};
 
-      const mockSendFunctions = {
+      const mockGetFunctions = {
         "sftp": {
           "method": getFileViaSftp,
           "client": mockSftpClient,
         },
       };
 
-      const forkableFunction = forwardToGetMethod("sftp")(mockConnectionConfig)(mockSendFunctions);
+      const forkableFunction = forwardToGetMethod("sftp")(mockConnectionConfig)(mockGetFunctions);
 
       fork
       (done)
@@ -163,6 +194,37 @@ describe("Integration Tests", function() {
   });
 
   describe("forwardToSendMethod", function() {
+    it("should reject if the method is not found", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "file.txt",
+        "user": "",
+        "password": "",
+      };
+
+      const mockFtpClient = new EventEmitter();
+      mockFtpClient.connect = () => { };
+      mockFtpClient.put = () => { };
+      mockFtpClient.get = () => { };
+      mockFtpClient.end = () => { };
+
+      const mockSendFunctions = {
+        "ftp": {
+          "method": getFileViaFtp,
+          "client": mockFtpClient,
+        },
+      };
+
+      fork
+      (err => {
+        expect(err).to.deep.equal("Send function not available");
+        done();
+      })
+      (done)
+      (forwardToSendMethod("email")(mockConnectionConfig)(mockSendFunctions)(new Readable()));
+    });
+
     it("should route to ftp", function(done) {
       const mockConnectionConfig = {
         "host": "",

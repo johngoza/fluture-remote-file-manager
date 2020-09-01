@@ -5,7 +5,7 @@ const {getFileViaFtp, sendFileViaFtp} = require("../../../lib/ftp.js");
 const {fork} = Future;
 const {Readable} = require("stream");
 
-describe("Unit Tests - FTP", function() {
+describe("Unit Tests - ftp.js", function() {
   describe("getFileViaFtp", function() {
     it("should return a future", function() {
       const fakeConnectionConfig = {

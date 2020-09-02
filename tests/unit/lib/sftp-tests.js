@@ -4,7 +4,7 @@ const {Future, fork} = require("fluture");
 const {getFileViaSftp, sendFileViaSftp} = require("../../../lib/sftp.js");
 const {Readable, PassThrough} = require("stream");
 
-describe("Unit Tests - SFTP", function() {
+describe("Unit Tests - sftp.js", function() {
   describe("getFileViaSftp", function() {
     it("should return a future", function() {
       const fakeConnectionConfig = {
@@ -26,7 +26,7 @@ describe("Unit Tests - SFTP", function() {
       expect(getFileViaSftp(mockSftpClient)(fakeConnectionConfig)).to.be.instanceOf(Future);
     });
 
-    it("should resolve with a readstream if get succeeds", function(done) {
+    it("should resolve with a readstream if 'get' succeeds", function(done) {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
@@ -73,7 +73,7 @@ describe("Unit Tests - SFTP", function() {
       readable.push(null);
     });
 
-    it("should reject if the get fails", function(done) {
+    it("should reject if 'get' fails", function(done) {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,

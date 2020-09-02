@@ -9,7 +9,7 @@ const {sendFileViaEmail} = require("../../lib/email.js");
 
 describe("Integration Tests", function() {
   describe("forwardToGetMethod", function() {
-    it("should reject if the method is not found", function(done) {
+    it("should reject if the desired get method is not found", function(done) {
       const mockConnectionConfig = {
         "host": "",
         "port": 1,
@@ -37,7 +37,7 @@ describe("Integration Tests", function() {
         done();
       })
       (done)
-      (forwardToGetMethod("email")(mockConnectionConfig)(mockGetFunctions));
+      (forwardToGetMethod("some-get-method")(mockConnectionConfig)(mockGetFunctions));
     });
 
     it("should route to ftp", function(done) {
@@ -73,11 +73,7 @@ describe("Integration Tests", function() {
 
       const forkableFunction = forwardToGetMethod("ftp")(mockConnectionConfig)(mockGetFunctions);
 
-      fork
-      (err => {
-        done(err);
-      })
-      (data => {
+      const validateResult = data => {
         let result = "";
 
         data.on("data", function(d) {
@@ -88,7 +84,13 @@ describe("Integration Tests", function() {
           expect(result).to.deep.equal("hello world");
           done();
         });
+      };
+
+      fork
+      (err => {
+        done(err);
       })
+      (validateResult)
       (forkableFunction);
     });
 
@@ -128,9 +130,7 @@ describe("Integration Tests", function() {
 
       const forkableFunction = forwardToGetMethod("sftp")(mockConnectionConfig)(mockGetFunctions);
 
-      fork
-      (done)
-      (data => {
+      const validateResult = data => {
         let result = "";
 
         data.on("data", function(d) {
@@ -141,7 +141,11 @@ describe("Integration Tests", function() {
           expect(result).to.deep.equal("hello world");
           done();
         });
-      })
+      };
+
+      fork
+      (done)
+      (validateResult)
       (forkableFunction);
 
       readable.push("hello world");
@@ -194,7 +198,7 @@ describe("Integration Tests", function() {
   });
 
   describe("forwardToSendMethod", function() {
-    it("should reject if the method is not found", function(done) {
+    it("should reject if the desired send method is not found", function(done) {
       const mockConnectionConfig = {
         "host": "",
         "port": 1,
@@ -222,7 +226,7 @@ describe("Integration Tests", function() {
         done();
       })
       (done)
-      (forwardToSendMethod("email")(mockConnectionConfig)(mockSendFunctions)(new Readable()));
+      (forwardToSendMethod("some-send-method")(mockConnectionConfig)(mockSendFunctions)(new Readable()));
     });
 
     it("should route to ftp", function(done) {

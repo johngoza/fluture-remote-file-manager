@@ -1,13 +1,104 @@
 const EventEmitter = require("events");
 const {expect} = require("chai");
 const {fork} = require("fluture");
-const {forwardToSendMethod, sendFile} = require("../../index.js");
+const {forwardToGetMethod, forwardToSendMethod, getFile, sendFile} = require("../../index.js");
+const {getFileViaFtp, sendFileViaFtp} = require("../../lib/ftp.js");
 const {Readable, PassThrough} = require("stream");
 const {sendFileViaEmail} = require("../../lib/email.js");
-const {sendFileViaFtp} = require("../../lib/ftp.js");
 const {sendFileViaSftp} = require("../../lib/sftp.js");
 
 describe("Integration Tests", function() {
+  describe("forwardToGetMethod", function() {
+    it("should route to ftp", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "file.txt",
+        "user": "",
+        "password": "",
+      };
+
+      const readable = new Readable();
+
+      readable.push("hello world");
+      readable.push(null);
+
+      const mockFtpClient = new EventEmitter();
+      mockFtpClient.connect = (config) => {
+        mockFtpClient.emit("ready");
+      };
+      mockFtpClient.put = () => { };
+      mockFtpClient.get = (path, callback) => {
+        callback(null, readable);
+      };
+      mockFtpClient.end = () => { };
+
+      const mockSendFunctions = {
+        "ftp": {
+          "method": getFileViaFtp,
+          "client": mockFtpClient,
+        },
+      };
+
+      const forkableFunction = forwardToGetMethod("ftp")(mockConnectionConfig)(mockSendFunctions);
+
+      fork
+      (err => {
+        done(err);
+      })
+      (data => {
+        let result = "";
+
+        data.on("data", function(d) {
+          result += d.toString();
+        });
+
+        data.on("end", function() {
+          expect(result).to.deep.equal("hello world");
+          done();
+        });
+      })
+      (forkableFunction);
+    });
+  });
+
+  describe("getFile", function() {
+    it("should route to ftp", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "file.txt",
+        "user": "",
+        "password": "",
+      };
+
+      const readable = new Readable();
+      readable.push("hello world");
+      readable.push(null);
+
+      const mockFtpClient = new EventEmitter();
+      mockFtpClient.connect = (config) => {
+        mockFtpClient.emit("ready");
+      };
+      mockFtpClient.put = () => { };
+      mockFtpClient.get = (path, callback) => {
+        callback(null, readable);
+      };
+      mockFtpClient.end = () => { };
+
+      const forkableFunction = getFile ("ftp") (mockConnectionConfig);
+
+      fork
+      (err => {
+        // error mean we got to the ftp client successfully
+        expect(err).to.deep.equal("ECONNREFUSED connect ECONNREFUSED 127.0.0.1:1");
+        done();
+      })
+      (done)
+      (forkableFunction);
+    });
+  });
+
   describe("forwardToSendMethod", function() {
     it("should route to ftp", function(done) {
       const mockConnectionConfig = {
@@ -22,6 +113,7 @@ describe("Integration Tests", function() {
       mockFtpClient.connect = (connectionconfiguration) => {
         mockFtpClient.emit("ready");
       };
+      mockFtpClient.get = () => { };
       mockFtpClient.put = (readable, path, callback) => {
         callback();
       };

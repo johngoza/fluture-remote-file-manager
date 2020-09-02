@@ -4,9 +4,61 @@ const Ftp = require("ftp");
 const path = require("path");
 const Readable = require("stream").Readable;
 const {fork} = require("fluture");
-const {sendFileViaFtp} = require(path.join(__dirname, "../../../lib/ftp.js"));
+const {getFileViaFtp, sendFileViaFtp} = require(path.join(__dirname, "../../../lib/ftp.js"));
 
 describe("SYSTEM TESTS - ftp.js", function() {
+  describe("getFileViaFtp", function() {
+    it("should get a file on an ftp server", function(done) {
+      this.timeout(5000);
+
+      // the hello.txt file can be found in /tests/system/resources/ftp
+      const connectionConfig = {
+        "host": "ftp-server",
+        "port": 21,
+        "remoteFilePath": "/hello.txt",
+        "user": "user",
+        "password": "password",
+      };
+
+      fork
+      (done)
+      (data => {
+        let result = "";
+
+        data.on("data", function(d) {
+          result += d.toString();
+        });
+
+        data.on("end", function() {
+          expect(result).to.deep.equal("hello world");
+          done();
+        });
+      })
+      (getFileViaFtp(new Ftp())(connectionConfig));
+    });
+
+    it("should reject if the server throws an error", function(done) {
+      this.timeout(5000);
+
+      // we don't allow anonymous login in test container
+      const connectionConfig = {
+        "host": "ftp-server",
+        "port": 21,
+        "remoteFilePath": "/hello.txt",
+        "user": "",
+        "password": "",
+      };
+
+      fork
+      (err => {
+        expect(err).to.deep.equal("530 Login incorrect.");
+        done();
+      })
+      (done)
+      (getFileViaFtp(new Ftp())(connectionConfig));
+    });
+  });
+
   describe("sendFileViaFtp", function() {
     it("should put a file on an ftp server", function(done) {
       this.timeout(5000);

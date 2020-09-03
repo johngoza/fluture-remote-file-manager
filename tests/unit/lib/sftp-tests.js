@@ -1,32 +1,12 @@
 const EventEmitter = require("events");
 const {expect} = require("chai");
-const {Future, fork} = require("fluture");
+const {fork} = require("fluture");
 const {getFileViaSftp, sendFileViaSftp} = require("../../../lib/sftp.js");
 const {Readable, PassThrough} = require("stream");
 
 describe("Unit Tests - sftp.js", function() {
   describe("getFileViaSftp", function() {
-    it("should return a future", function() {
-      const fakeConnectionConfig = {
-        "host": "",
-        "port": 1,
-        "remoteFilePath": "",
-        "user": "",
-        "password": "",
-      };
-
-      // this is required for sanctuary type checking
-      const mockSftpClient = {
-        "connect": () => {},
-        "end": () => {},
-        "on": () => {},
-        "sftp": () => {},
-      };
-
-      expect(getFileViaSftp(mockSftpClient)(fakeConnectionConfig)).to.be.instanceOf(Future);
-    });
-
-    it("should resolve with a readstream if 'get' succeeds", function(done) {
+    it("should resolve with a readstream if get succeeds", function(done) {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
@@ -53,9 +33,7 @@ describe("Unit Tests - sftp.js", function() {
       mockSftpClient.on("ready", () => {});
       mockSftpClient.end = () => {};
 
-      fork
-      (done)
-      (data => {
+      const validateResults = data => {
         let result = "";
 
         data.on("data", function(d) {
@@ -66,14 +44,18 @@ describe("Unit Tests - sftp.js", function() {
           expect(result).to.deep.equal("hello world");
           done();
         });
-      })
+      };
+
+      fork
+      (done)
+      (validateResults)
       (getFileViaSftp(mockSftpClient)(fakeConnectionConfig));
 
       readable.push("hello world");
       readable.push(null);
     });
 
-    it("should reject if 'get' fails", function(done) {
+    it("should reject if get method fails", function(done) {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
@@ -150,26 +132,6 @@ describe("Unit Tests - sftp.js", function() {
   });
 
   describe("sendFileViaSftp", function() {
-    it("should return a future", function() {
-      const fakeConnectionConfig = {
-        "host": "",
-        "port": 1,
-        "remoteFilePath": "",
-        "user": "",
-        "password": "",
-      };
-
-      // this is required for sanctuary type checking
-      const mockSftpClient = {
-        "connect": () => {},
-        "end": () => {},
-        "on": () => {},
-        "sftp": () => {},
-      };
-
-      expect(sendFileViaSftp(mockSftpClient)(new Readable())(fakeConnectionConfig)).to.be.instanceOf(Future);
-    });
-
     it("should resolve with a success message if put succeeds", function(done) {
       const fakeConnectionConfig = {
         "host": "",

@@ -3,12 +3,43 @@ const {expect} = require("chai");
 const {fork} = require("fluture");
 const {forwardToGetMethod, forwardToSendMethod, getFile, sendFile} = require("../../index.js");
 const {getFileViaFtp, sendFileViaFtp} = require("../../lib/ftp.js");
+const {getFileViaSftp, sendFileViaSftp} = require("../../lib/sftp.js");
 const {Readable, PassThrough} = require("stream");
 const {sendFileViaEmail} = require("../../lib/email.js");
-const {sendFileViaSftp} = require("../../lib/sftp.js");
 
 describe("Integration Tests", function() {
   describe("forwardToGetMethod", function() {
+    it("should reject if the desired get method is not found", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "file.txt",
+        "user": "",
+        "password": "",
+      };
+
+      const mockFtpClient = new EventEmitter();
+      mockFtpClient.connect = () => { };
+      mockFtpClient.put = () => { };
+      mockFtpClient.get = () => { };
+      mockFtpClient.end = () => { };
+
+      const mockGetFunctions = {
+        "ftp": {
+          "method": getFileViaFtp,
+          "client": mockFtpClient,
+        },
+      };
+
+      fork
+      (err => {
+        expect(err).to.deep.equal("Get function not available");
+        done();
+      })
+      (done)
+      (forwardToGetMethod("some-get-method")(mockConnectionConfig)(mockGetFunctions));
+    });
+
     it("should route to ftp", function(done) {
       const mockConnectionConfig = {
         "host": "",
@@ -33,20 +64,16 @@ describe("Integration Tests", function() {
       };
       mockFtpClient.end = () => { };
 
-      const mockSendFunctions = {
+      const mockGetFunctions = {
         "ftp": {
           "method": getFileViaFtp,
           "client": mockFtpClient,
         },
       };
 
-      const forkableFunction = forwardToGetMethod("ftp")(mockConnectionConfig)(mockSendFunctions);
+      const forkableFunction = forwardToGetMethod("ftp")(mockConnectionConfig)(mockGetFunctions);
 
-      fork
-      (err => {
-        done(err);
-      })
-      (data => {
+      const validateResult = data => {
         let result = "";
 
         data.on("data", function(d) {
@@ -57,8 +84,72 @@ describe("Integration Tests", function() {
           expect(result).to.deep.equal("hello world");
           done();
         });
+      };
+
+      fork
+      (err => {
+        done(err);
       })
+      (validateResult)
       (forkableFunction);
+    });
+
+    it("should route to sftp", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "file.txt",
+        "user": "",
+        "password": "",
+      };
+
+      const readable = new Readable();
+      const mockSftpClient = new EventEmitter();
+
+      const sftp = {
+        "createReadStream": (remoteFilePath) => {
+          return readable;
+        },
+      };
+
+      mockSftpClient.sftp = (cb) => {
+        cb(null, sftp);
+      };
+      mockSftpClient.connect = () => {
+        mockSftpClient.emit("ready");
+      };
+      mockSftpClient.on("ready", () => {});
+      mockSftpClient.end = () => {};
+
+      const mockGetFunctions = {
+        "sftp": {
+          "method": getFileViaSftp,
+          "client": mockSftpClient,
+        },
+      };
+
+      const forkableFunction = forwardToGetMethod("sftp")(mockConnectionConfig)(mockGetFunctions);
+
+      const validateResult = data => {
+        let result = "";
+
+        data.on("data", function(d) {
+          result += d.toString();
+        });
+
+        data.on("end", function() {
+          expect(result).to.deep.equal("hello world");
+          done();
+        });
+      };
+
+      fork
+      (done)
+      (validateResult)
+      (forkableFunction);
+
+      readable.push("hello world");
+      readable.push(null);
     });
   });
 
@@ -72,20 +163,6 @@ describe("Integration Tests", function() {
         "password": "",
       };
 
-      const readable = new Readable();
-      readable.push("hello world");
-      readable.push(null);
-
-      const mockFtpClient = new EventEmitter();
-      mockFtpClient.connect = (config) => {
-        mockFtpClient.emit("ready");
-      };
-      mockFtpClient.put = () => { };
-      mockFtpClient.get = (path, callback) => {
-        callback(null, readable);
-      };
-      mockFtpClient.end = () => { };
-
       const forkableFunction = getFile ("ftp") (mockConnectionConfig);
 
       fork
@@ -97,9 +174,61 @@ describe("Integration Tests", function() {
       (done)
       (forkableFunction);
     });
+
+    it("should route to sftp", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "file.txt",
+        "user": "",
+        "password": "",
+      };
+
+      const forkableFunction = getFile ("sftp") (mockConnectionConfig);
+
+      fork
+      (err => {
+        // error mean we got to the ftp client successfully
+        expect(err.toString()).to.deep.equal("Error: connect ECONNREFUSED 127.0.0.1:1");
+        done();
+      })
+      (done)
+      (forkableFunction);
+    });
   });
 
   describe("forwardToSendMethod", function() {
+    it("should reject if the desired send method is not found", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "file.txt",
+        "user": "",
+        "password": "",
+      };
+
+      const mockFtpClient = new EventEmitter();
+      mockFtpClient.connect = () => { };
+      mockFtpClient.put = () => { };
+      mockFtpClient.get = () => { };
+      mockFtpClient.end = () => { };
+
+      const mockSendFunctions = {
+        "ftp": {
+          "method": getFileViaFtp,
+          "client": mockFtpClient,
+        },
+      };
+
+      fork
+      (err => {
+        expect(err).to.deep.equal("Send function not available");
+        done();
+      })
+      (done)
+      (forwardToSendMethod("some-send-method")(mockConnectionConfig)(mockSendFunctions)(new Readable()));
+    });
+
     it("should route to ftp", function(done) {
       const mockConnectionConfig = {
         "host": "",

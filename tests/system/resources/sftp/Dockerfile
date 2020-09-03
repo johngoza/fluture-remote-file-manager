@@ -18,6 +18,8 @@ RUN chmod -R 700 /home/user/.ssh && chown -R user /home/user/.ssh
 
 COPY sftp.conf /etc/ssh/sshd_config
 
+COPY ./hello.txt /home/user/hello.txt
+
 EXPOSE 22
 
 CMD /usr/sbin/sshd -D

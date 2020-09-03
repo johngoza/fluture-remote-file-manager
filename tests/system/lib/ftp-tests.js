@@ -6,6 +6,8 @@ const Readable = require("stream").Readable;
 const {fork} = require("fluture");
 const {getFileViaFtp, sendFileViaFtp} = require(path.join(__dirname, "../../../lib/ftp.js"));
 
+// todo: update existing tests to use index functions rather than directly reference the library
+
 describe("SYSTEM TESTS - ftp.js", function() {
   describe("getFileViaFtp", function() {
     it("should get a file on an ftp server", function(done) {

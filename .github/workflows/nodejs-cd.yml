@@ -2,7 +2,7 @@ name: NodeJS Continuous Deploy
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, fix-cd ]
 jobs:
   build:
     runs-on: ubuntu-latest

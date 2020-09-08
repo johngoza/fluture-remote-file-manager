@@ -8,6 +8,7 @@ RUN npm install --ignore-scripts
 COPY index.js index.js
 COPY ./lib lib
 COPY ./tests/system ./tests/system
+COPY ./tests/system/resources/hello.txt ./hello.txt
 
 EXPOSE 21 31 21000-21010
 

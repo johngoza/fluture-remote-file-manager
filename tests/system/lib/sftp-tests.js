@@ -7,6 +7,30 @@ const {getFile, sendFile} = require(path.join(__dirname, "../../../index.js"));
 
 describe("SYSTEM TESTS - sftp.js", function() {
   describe("sendFileViaSftp", function() {
+    it("should put a file on an sftp server that uses key auth", function(done) {
+      const privateKey = fs.readFileSync("tests/system/resources/sftp/host_id_rsa");
+
+      const connectionConfig = {
+        "host": "sftp-server",
+        "port": 22,
+        "remoteFilePath": "some_file.txt",
+        "user": "user",
+        "privateKey": privateKey,
+      };
+
+      const filepath = "tests/system/resources/hello.txt";
+
+      fork
+      (err => {
+        done(err);
+      })
+      (data => {
+        expect(data).to.deep.equal("Upload successful");
+        done();
+      })
+      (sendFile("sftp")(connectionConfig)(filepath));
+    });
+
     it("should put a file on an sftp server that uses password auth", function(done) {
       const connectionConfig = {
         "host": "sftp-server",
@@ -28,32 +52,6 @@ describe("SYSTEM TESTS - sftp.js", function() {
       })
       (sendFile("sftp")(connectionConfig)(filepath));
     });
-
-    // todo: figure this out. why is this timing out??
-    // it("should put a file on an sftp server that uses key auth", function(done) {
-    //   const privateKey = fs.readFileSync("tests/system/resources/sftp/host_id_rsa");
-    //
-    //   const connectionConfig = {
-    //     "host": "sftp-server",
-    //     "port": 22,
-    //     "remoteFilePath": "some_file.txt",
-    //     "user": "user",
-    //     "privateKey": privateKey,
-    //   };
-    //
-    //   const filepath = "tests/system/resources/hello.txt";
-    //
-    //   fork
-    //   (err => {
-    //     done(err);
-    //   })
-    //   (data => {
-    //     console.log("data received");
-    //     expect(data).to.deep.equal("Upload successful");
-    //     done();
-    //   })
-    //   (sendFile("sftp")(connectionConfig)(filepath));
-    // });
 
     it("should fail with a descriptive message if there is an error", function(done) {
       // anonymous login not allowed in test sftp server
@@ -107,8 +105,6 @@ describe("SYSTEM TESTS - sftp.js", function() {
     });
 
     it("should get a file on an sftp server that uses key auth", function(done) {
-      this.timeout(5000);
-
       const privateKey = fs.readFileSync("tests/system/resources/sftp/host_id_rsa");
 
       const connectionConfig = {

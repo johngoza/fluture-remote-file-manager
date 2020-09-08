@@ -16,7 +16,7 @@ const server = new SMTPServer({
       try {
         attachmentBody = mail.attachments[0].content.toString();
         callback(null, attachmentBody);
-      } catch (e) {
+      } catch (e) { // catch null reference
         callback(e);
       }
 

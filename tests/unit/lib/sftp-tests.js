@@ -172,6 +172,7 @@ describe("Unit Tests - sftp.js", function() {
       (done)
       (verifyResult)
       (sendFileViaSftp(mockSftpClient)(readable)(fakeConnectionConfig));
+      passThrough.emit("ready");
       passThrough.emit("close");
     });
 

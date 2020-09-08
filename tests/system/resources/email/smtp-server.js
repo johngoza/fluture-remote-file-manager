@@ -1,7 +1,5 @@
-const fs = require("fs");
+const simpleParser = require("mailparser").simpleParser;
 const SMTPServer = require("smtp-server").SMTPServer;
-
-const writeStream = fs.createWriteStream("/dev/null");
 
 const server = new SMTPServer({
   onAuth(auth, session, callback) {
@@ -11,12 +9,17 @@ const server = new SMTPServer({
     callback(null, {"user": 123});
   },
   onData(stream, session, callback) {
-    // this is required to close the connection
-    // since stream.destroy() does not work here for some reason
-    stream.pipe(writeStream);
+    simpleParser(stream, (err, mail) => {
+      if (err) callback(err);
 
-    stream.on("end", () => {
-      callback(null, "accepted");
+      let attachmentBody;
+      try {
+        attachmentBody = mail.attachments[0].content.toString();
+        callback(null, attachmentBody);
+      } catch (e) {
+        callback(e);
+      }
+
       server.close(() => {});
     });
   },

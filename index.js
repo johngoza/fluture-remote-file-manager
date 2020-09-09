@@ -31,8 +31,8 @@ const getFile = def("getFile")
 
 const forwardToSendMethod = def("forwardToSendMethod")
 ({})
-([$.String, ConnectionConfig, $.Object, ReadStreamType, FutureType ($.String) ($.String)])
-(sendMethod => connectionConfig => sendFunctions => readStream => {
+([$.String, $.Object, ConnectionConfig, ReadStreamType, FutureType ($.String) ($.String)])
+(sendMethod => sendFunctions => connectionConfig => readStream => {
   const methodLens = R.lensPath([sendMethod, "method"]);
   const sendingFunction = R.view(methodLens, sendFunctions);
   const clientLens = R.lensPath([sendMethod, "client"]);
@@ -49,7 +49,7 @@ const sendFile = def("sendFile")
 ({})
 ([$.String, ConnectionConfig, $.String, FutureType($.String)($.String)])
 (sendMethod => connectionConfig => fileName => {
-  return chain (forwardToSendMethod(sendMethod) (connectionConfig) (sendFunctions)) (createReadStream(fs, fileName));
+  return chain (forwardToSendMethod(sendMethod) (sendFunctions) (connectionConfig)) (createReadStream(fs, fileName));
 });
 
 module.exports = {

@@ -1,8 +1,7 @@
 const EventEmitter = require("events");
-const Future = require("fluture");
 const {expect} = require("chai");
+const {Future, fork} = require("fluture");
 const {getFileViaFtp, sendFileViaFtp} = require("../../../lib/ftp.js");
-const {fork} = Future;
 const {Readable} = require("stream");
 
 describe("Unit Tests - ftp.js", function() {

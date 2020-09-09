@@ -238,7 +238,7 @@ describe("Integration Tests", function() {
         done();
       })
       (done)
-      (forwardToSendMethod("some-send-method")(mockConnectionConfig)(mockSendFunctions)(new Readable()));
+      (forwardToSendMethod("some-send-method") (mockSendFunctions) (mockConnectionConfig) (new Readable()));
     });
 
     it("should route to ftp", function(done) {
@@ -279,7 +279,7 @@ describe("Integration Tests", function() {
         expect(data).to.deep.equal("Upload successful");
         done();
       })
-      (forwardToSendMethod ("ftp") (mockConnectionConfig) (mockSendFunctions) (readable));
+      (forwardToSendMethod ("ftp") (mockSendFunctions) (mockConnectionConfig) (readable));
     });
 
     it("should route to sftp", function(done) {
@@ -328,7 +328,7 @@ describe("Integration Tests", function() {
         expect(data).to.deep.equal("Upload successful");
         done();
       })
-      (forwardToSendMethod ("sftp") (mockConnectionConfig) (mockSendFunctions) (readable));
+      (forwardToSendMethod ("sftp") (mockSendFunctions) (mockConnectionConfig) (readable));
 
       passThrough.emit("ready");
       passThrough.emit("close");
@@ -376,7 +376,7 @@ describe("Integration Tests", function() {
         expect(data).to.equal("Upload successful");
         done();
       })
-      (forwardToSendMethod ("email") (mockConfig) (mockSendFunctions) (new Readable()));
+      (forwardToSendMethod ("email") (mockSendFunctions) (mockConfig) (new Readable()));
     });
 
     it("should reject if an unsupported send method string is provided", function(done) {
@@ -403,7 +403,7 @@ describe("Integration Tests", function() {
       (data => {
         done("Expected an error but recieved " + data);
       })
-      (forwardToSendMethod ("bar") (mockConnectionConfig) (mockSendFunctions) (new Readable()));
+      (forwardToSendMethod ("bar") (mockSendFunctions) (mockConnectionConfig) (new Readable()));
     });
   });
 

@@ -45,12 +45,16 @@ const forwardToSendMethod = def("forwardToSendMethod")
     : sendingFunction(client)(readStream)(connectionConfig);
 });
 
-const sendFile = def("sendFile")
+const injectFileReadStream = def("injectFileReadStream")
 ({})
-([$.String, ConnectionConfig, $.String, FutureType($.String)($.String)])
-(sendMethod => connectionConfig => fileName => {
-  return chain (forwardToSendMethod(sendMethod) (sendFunctions) (connectionConfig)) (createReadStream(fs, fileName));
+([$.String, $.String, ConnectionConfig, FutureType($.String)($.String)])
+(sendMethod => fileName => connectionConfig => {
+  return chain (forwardToSendMethod(sendMethod) (sendFunctions) (connectionConfig)) (createReadStream(fs) (fileName));
 });
+
+const sendFile = sendMethod => connectionConfig => fileName => {
+  return chain (injectFileReadStream(sendMethod)(fileName)) (validateConnectionConfig(connectionConfig));
+};
 
 module.exports = {
   forwardToGetMethod,

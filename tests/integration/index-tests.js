@@ -159,7 +159,7 @@ describe("Integration Tests", function() {
         "password": "",
       };
 
-      const expectedResult = ["host is missing or empty", "remoteFilePath is missing or empty"];
+      const expectedResult = ["host is missing or invalid", "remoteFilePath is missing or invalid"];
 
       fork
       (err => {
@@ -408,23 +408,34 @@ describe("Integration Tests", function() {
   });
 
   describe("sendFile", function() {
-    it("should route to ftp", function(done) {
+    it("should reject is the connectionConfig is invalid", function(done) {
       const mockConnectionConfig = {
         "host": "",
+        "port": 1,
+        "remoteFilePath": "",
+        "user": "",
+        "password": "",
+      };
+
+      const expectedResult = ["host is missing or invalid", "remoteFilePath is missing or invalid"];
+
+      fork
+      (err => {
+        expect(err).to.deep.equal(expectedResult);
+        done();
+      })
+      (done)
+      (sendFile ("ftp") (mockConnectionConfig) ("tests/unit/resources/hello.txt"));
+    });
+
+    it("should route to ftp", function(done) {
+      const mockConnectionConfig = {
+        "host": "localhost",
         "port": 1,
         "remoteFilePath": "file.txt",
         "user": "",
         "password": "",
       };
-
-      const mockFtpClient = new EventEmitter();
-      mockFtpClient.connect = (connectionconfiguration) => {
-        mockFtpClient.emit("ready");
-      };
-      mockFtpClient.put = (readable, path, callback) => {
-        callback();
-      };
-      mockFtpClient.end = () => { };
 
       fork
       (err => {
@@ -440,7 +451,7 @@ describe("Integration Tests", function() {
 
     it("should route to sftp", function(done) {
       const mockConnectionConfig = {
-        "host": "",
+        "host": "localhost",
         "port": 1,
         "remoteFilePath": "file.txt",
         "user": "",
@@ -465,12 +476,13 @@ describe("Integration Tests", function() {
         "from": "",
         "subject": "",
         "text": "",
+        "content": "hello",
       };
 
       const mockConfig = {
-        "host": "",
+        "host": "localhost",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFilePath": "pathtofile",
         "auth": {
           "user": "",
           "pass": "",

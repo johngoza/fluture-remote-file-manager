@@ -78,6 +78,36 @@ describe("Unit Tests - ftp.js", function() {
         "password": "",
       };
 
+      const errorMessage = {"code": "503", "message": "get failed"};
+
+      const mockFtpClient = new EventEmitter();
+      mockFtpClient.connect = (config) => {
+        mockFtpClient.emit("ready");
+      };
+      mockFtpClient.put = () => { };
+      mockFtpClient.get = (p, cb) => {
+        cb(errorMessage, null);
+      };
+      mockFtpClient.end = () => { };
+
+      fork
+      (err => {
+        expect(err).to.equal("503 get failed");
+        done();
+      })
+      (done)
+      (getFileViaFtp(mockFtpClient)(fakeConnectionConfig));
+    });
+
+    it("should reject if the client throws an error during get", function(done) {
+      const fakeConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "",
+        "user": "",
+        "password": "",
+      };
+
       const mockFtpClient = new EventEmitter();
       mockFtpClient.connect = (config) => {
         mockFtpClient.emit("ready");

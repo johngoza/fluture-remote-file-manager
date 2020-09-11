@@ -10,7 +10,7 @@ describe("Unit Tests - sftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "some_file.txt",
+        "remoteFileName": "some_file.txt",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -20,7 +20,7 @@ describe("Unit Tests - sftp.js", function() {
       const mockSftpClient = new EventEmitter();
 
       const sftp = {
-        "createReadStream": (remoteFilePath) => {
+        "createReadStream": (remoteFileName) => {
           return readable;
         },
       };
@@ -61,7 +61,7 @@ describe("Unit Tests - sftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "some_file.txt",
+        "remoteFileName": "some_file.txt",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -71,7 +71,7 @@ describe("Unit Tests - sftp.js", function() {
       const mockSftpClient = new EventEmitter();
 
       const sftp = {
-        "createReadStream": (remoteFilePath) => {
+        "createReadStream": (remoteFileName) => {
           return readable;
         },
       };
@@ -101,7 +101,7 @@ describe("Unit Tests - sftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "some_file.txt",
+        "remoteFileName": "some_file.txt",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -140,7 +140,7 @@ describe("Unit Tests - sftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "some_file.txt",
+        "remoteFileName": "some_file.txt",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -154,7 +154,7 @@ describe("Unit Tests - sftp.js", function() {
       const mockSftpClient = new EventEmitter();
 
       const sftp = {
-        "createWriteStream": (remoteFilePath) => {
+        "createWriteStream": (remoteFileName) => {
           return passThrough;
         },
       };
@@ -185,7 +185,7 @@ describe("Unit Tests - sftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "some_file.txt",
+        "remoteFileName": "some_file.txt",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -199,7 +199,7 @@ describe("Unit Tests - sftp.js", function() {
       const mockSftpClient = new EventEmitter();
 
       const sftp = {
-        "createWriteStream": (remoteFilePath) => {
+        "createWriteStream": (remoteFileName) => {
           return passThrough;
         },
       };
@@ -229,7 +229,7 @@ describe("Unit Tests - sftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "some_file.txt",
+        "remoteFileName": "some_file.txt",
         "remoteDirectory": "",
         "user": "",
         "password": "",

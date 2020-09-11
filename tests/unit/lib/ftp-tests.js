@@ -10,7 +10,7 @@ describe("Unit Tests - ftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFileName": "",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -33,7 +33,7 @@ describe("Unit Tests - ftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFileName": "",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -75,7 +75,7 @@ describe("Unit Tests - ftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFileName": "",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -106,7 +106,7 @@ describe("Unit Tests - ftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFileName": "",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -137,7 +137,7 @@ describe("Unit Tests - ftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFileName": "",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -160,7 +160,7 @@ describe("Unit Tests - ftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFileName": "",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -190,7 +190,7 @@ describe("Unit Tests - ftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFileName": "",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -220,7 +220,7 @@ describe("Unit Tests - ftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFileName": "",
         "remoteDirectory": "",
         "user": "",
         "password": "",

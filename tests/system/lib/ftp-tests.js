@@ -14,7 +14,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
       const connectionConfig = {
         "host": "ftp-server",
         "port": 21,
-        "remoteFilePath": "/hello.txt",
+        "remoteFileName": "/hello.txt",
         "user": "user",
         "password": "password",
       };
@@ -43,7 +43,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
       const connectionConfig = {
         "host": "ftp-server",
         "port": 21,
-        "remoteFilePath": "/hello.txt",
+        "remoteFileName": "/hello.txt",
         "user": "",
         "password": "",
       };
@@ -65,7 +65,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
       const connectionConfig = {
         "host": "ftp-server",
         "port": 21,
-        "remoteFilePath": "/ftp/user/some_file.txt",
+        "remoteFileName": "/ftp/user/some_file.txt",
         "user": "user",
         "password": "password",
       };
@@ -76,7 +76,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
         let finalVal;
 
         ftpClient.on("ready", () => {
-          ftpClient.get(connectionConfig.remoteFilePath, (err, stream) => {
+          ftpClient.get(connectionConfig.remoteFileName, (err, stream) => {
             if (err) throw err;
 
             const chunks = [];
@@ -115,7 +115,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
       const connectionConfig = {
         "host": "ftp-server",
         "port": 21,
-        "remoteFilePath": "/ftp/user/some_file.txt",
+        "remoteFileName": "/ftp/user/some_file.txt",
         "user": "",
         "password": "",
       };
@@ -139,7 +139,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
       const connectionConfig = {
         "host": "ftps-server",
         "port": 21,
-        "remoteFilePath": "/user/some_file.txt",
+        "remoteFileName": "/user/some_file.txt",
         "user": "user",
         "password": "password",
         "secure": true,
@@ -158,7 +158,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
         });
 
         ftpClient.on("ready", () => {
-          ftpClient.get(connectionConfig.remoteFilePath, (err, stream) => {
+          ftpClient.get(connectionConfig.remoteFileName, (err, stream) => {
             if (err) {
               done(err);
             } else {
@@ -200,7 +200,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
       const connectionConfig = {
         "host": "ftps-server",
         "port": 21,
-        "remoteFilePath": "/user/some_file.txt",
+        "remoteFileName": "/user/some_file.txt",
         "user": "user",
         "password": "",
         "secure": true,

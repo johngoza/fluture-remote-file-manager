@@ -54,7 +54,7 @@ describe("Unit Tests - UtilityFunctions", function() {
       const config = {
         "host": "some-site",
         "port": 2,
-        "remoteFilePath": "some-path",
+        "remoteFileName": "some-path",
       };
 
       fork
@@ -69,7 +69,7 @@ describe("Unit Tests - UtilityFunctions", function() {
     it("should reject if host is missing", function(done) {
       const config = {
         "port": 2,
-        "remoteFilePath": "some_path.xml",
+        "remoteFileName": "some_path.xml",
       };
 
       const expectedError = ["host is missing or invalid"];
@@ -87,7 +87,7 @@ describe("Unit Tests - UtilityFunctions", function() {
       const config = {
         "host": "",
         "port": 2,
-        "remoteFilePath": "some_path.xml",
+        "remoteFileName": "some_path.xml",
       };
 
       const expectedError = ["host is missing or invalid"];
@@ -105,7 +105,7 @@ describe("Unit Tests - UtilityFunctions", function() {
       const config = {
         "host": 13,
         "port": 2,
-        "remoteFilePath": "some_path.xml",
+        "remoteFileName": "some_path.xml",
       };
 
       const expectedError = ["host is missing or invalid"];
@@ -122,7 +122,7 @@ describe("Unit Tests - UtilityFunctions", function() {
     it("should reject if port is missing", function(done) {
       const config = {
         "host": "some-site",
-        "remoteFilePath": "some_path.xml",
+        "remoteFileName": "some_path.xml",
       };
 
       const expectedError = ["port is missing or invalid"];
@@ -140,7 +140,7 @@ describe("Unit Tests - UtilityFunctions", function() {
       const config = {
         "host": "some-site",
         "port": null,
-        "remoteFilePath": "some_path.xml",
+        "remoteFileName": "some_path.xml",
       };
 
       const expectedError = ["port is missing or invalid"];
@@ -158,7 +158,7 @@ describe("Unit Tests - UtilityFunctions", function() {
       const config = {
         "host": "some-site",
         "port": "portt",
-        "remoteFilePath": "some_path.xml",
+        "remoteFileName": "some_path.xml",
       };
 
       const expectedError = ["port is missing or invalid"];
@@ -176,7 +176,7 @@ describe("Unit Tests - UtilityFunctions", function() {
       const config = {
         "host": "some-site",
         "port": -3,
-        "remoteFilePath": "some_path.xml",
+        "remoteFileName": "some_path.xml",
       };
 
       const expectedError = ["port is missing or invalid"];
@@ -190,13 +190,13 @@ describe("Unit Tests - UtilityFunctions", function() {
       (validateConnectionConfig(config));
     });
 
-    it("should reject if remoteFilePath is missing", function(done) {
+    it("should reject if remoteFileName is missing", function(done) {
       const config = {
         "host": "some-site",
         "port": 2,
       };
 
-      const expectedError = ["remoteFilePath is missing or invalid"];
+      const expectedError = ["remoteFileName is missing or invalid"];
 
       fork
       (err => {
@@ -207,14 +207,14 @@ describe("Unit Tests - UtilityFunctions", function() {
       (validateConnectionConfig(config));
     });
 
-    it("should reject if remoteFilePath is null", function(done) {
+    it("should reject if remoteFileName is null", function(done) {
       const config = {
         "host": "some-site",
         "port": 2,
-        "remoteFilePath": "",
+        "remoteFileName": "",
       };
 
-      const expectedError = ["remoteFilePath is missing or invalid"];
+      const expectedError = ["remoteFileName is missing or invalid"];
 
       fork
       (err => {
@@ -225,14 +225,14 @@ describe("Unit Tests - UtilityFunctions", function() {
       (validateConnectionConfig(config));
     });
 
-    it("should reject if remoteFilePath is not a string", function(done) {
+    it("should reject if remoteFileName is not a string", function(done) {
       const config = {
         "host": "some-site",
         "port": 2,
-        "remoteFilePath": 1776,
+        "remoteFileName": 1776,
       };
 
-      const expectedError = ["remoteFilePath is missing or invalid"];
+      const expectedError = ["remoteFileName is missing or invalid"];
 
       fork
       (err => {

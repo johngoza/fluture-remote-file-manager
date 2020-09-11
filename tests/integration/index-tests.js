@@ -13,7 +13,7 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "hostname",
         "port": 1,
-        "remoteFilePath": "file.txt",
+        "remoteFileName": "file.txt",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -45,7 +45,7 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "hostname",
         "port": 1,
-        "remoteFilePath": "file.txt",
+        "remoteFileName": "file.txt",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -98,7 +98,7 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "hostname",
         "port": 1,
-        "remoteFilePath": "file.txt",
+        "remoteFileName": "file.txt",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -108,7 +108,7 @@ describe("Integration Tests", function() {
       const mockSftpClient = new EventEmitter();
 
       const sftp = {
-        "createReadStream": (remoteFilePath) => {
+        "createReadStream": (remoteFileName) => {
           return readable;
         },
       };
@@ -158,10 +158,10 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFileName": "",
       };
 
-      const expectedResult = ["host is missing or invalid", "remoteFilePath is missing or invalid"];
+      const expectedResult = ["host is missing or invalid", "remoteFileName is missing or invalid"];
 
       fork
       (err => {
@@ -176,7 +176,7 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "localhost",
         "port": 1,
-        "remoteFilePath": "file.txt",
+        "remoteFileName": "file.txt",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -196,7 +196,7 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "localhost",
         "port": 1,
-        "remoteFilePath": "file.txt",
+        "remoteFileName": "file.txt",
         "remoteDirectory": "",
         "user": "user",
       };
@@ -217,7 +217,7 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "hostname",
         "port": 1,
-        "remoteFilePath": "file.txt",
+        "remoteFileName": "file.txt",
       };
 
       const mockSendFunctions = {
@@ -240,7 +240,7 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "hostname",
         "port": 1,
-        "remoteFilePath": "file.txt",
+        "remoteFileName": "file.txt",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -282,7 +282,7 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "hostname",
         "port": 1,
-        "remoteFilePath": "file.txt",
+        "remoteFileName": "file.txt",
         "remoteDirectory": "",
       };
 
@@ -290,7 +290,7 @@ describe("Integration Tests", function() {
       const mockSftpClient = new EventEmitter();
 
       const sftp = {
-        "createWriteStream": (remoteFilePath) => {
+        "createWriteStream": (remoteFileName) => {
           return passThrough;
         },
       };
@@ -340,7 +340,7 @@ describe("Integration Tests", function() {
       const mockConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFileName": "",
         "auth": {
           "user": "",
           "pass": "",
@@ -380,10 +380,10 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFileName": "",
       };
 
-      const expectedResult = ["host is missing or invalid", "remoteFilePath is missing or invalid"];
+      const expectedResult = ["host is missing or invalid", "remoteFileName is missing or invalid"];
 
       fork
       (err => {
@@ -398,7 +398,7 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "localhost",
         "port": 1,
-        "remoteFilePath": "file.txt",
+        "remoteFileName": "file.txt",
         "remoteDirectory": "",
         "user": "",
         "password": "",
@@ -420,7 +420,7 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "localhost",
         "port": 1,
-        "remoteFilePath": "file.txt",
+        "remoteFileName": "file.txt",
         "remoteDirectory": "",
         "user": "user",
       };
@@ -449,7 +449,7 @@ describe("Integration Tests", function() {
       const mockConfig = {
         "host": "localhost",
         "port": 1,
-        "remoteFilePath": "pathtofile",
+        "remoteFileName": "pathtofile",
         "auth": {
           "user": "",
           "pass": "",

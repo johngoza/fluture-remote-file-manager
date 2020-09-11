@@ -20,7 +20,7 @@ describe("SYSTEM TESTS - email.js", function() {
       const config = {
         "host": "localhost",
         "port": 587,
-        "remoteFilePath": "hello.txt",
+        "remoteFileName": "hello.txt",
         "auth": {
           "user": "user",
           "pass": "password",

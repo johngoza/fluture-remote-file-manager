@@ -13,7 +13,7 @@ describe("SYSTEM TESTS - sftp.js", function() {
       const connectionConfig = {
         "host": "sftp-server",
         "port": 22,
-        "remoteFilePath": "some_file.txt",
+        "remoteFileName": "some_file.txt",
         "user": "user",
         "privateKey": privateKey,
       };
@@ -35,7 +35,7 @@ describe("SYSTEM TESTS - sftp.js", function() {
       const connectionConfig = {
         "host": "sftp-server",
         "port": 22,
-        "remoteFilePath": "some_file.txt",
+        "remoteFileName": "some_file.txt",
         "user": "user",
         "password": "password",
       };
@@ -58,7 +58,7 @@ describe("SYSTEM TESTS - sftp.js", function() {
       const connectionConfig = {
         "host": "sftp-server",
         "port": 22,
-        "remoteFilePath": "some_file.txt",
+        "remoteFileName": "some_file.txt",
         "user": "",
         "password": "",
       };
@@ -80,7 +80,7 @@ describe("SYSTEM TESTS - sftp.js", function() {
       const connectionConfig = {
         "host": "sftp-server",
         "port": 22,
-        "remoteFilePath": "hello.txt",
+        "remoteFileName": "hello.txt",
         "user": "user",
         "password": "password",
       };
@@ -110,7 +110,7 @@ describe("SYSTEM TESTS - sftp.js", function() {
       const connectionConfig = {
         "host": "sftp-server",
         "port": 22,
-        "remoteFilePath": "hello.txt",
+        "remoteFileName": "hello.txt",
         "user": "user",
         "privateKey": privateKey,
       };
@@ -139,7 +139,7 @@ describe("SYSTEM TESTS - sftp.js", function() {
       const connectionConfig = {
         "host": "sftp-server",
         "port": 22,
-        "remoteFilePath": "some_file.txt",
+        "remoteFileName": "some_file.txt",
         "user": "",
         "password": "",
       };

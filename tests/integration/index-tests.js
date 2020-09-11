@@ -144,6 +144,7 @@ describe("Integration Tests", function() {
       (validateResult)
       (forwardToGetMethod("sftp")(mockGetFunctions)(mockConnectionConfig));
 
+      readable.emit("ready");
       readable.push("hello world");
       readable.push(null);
     });

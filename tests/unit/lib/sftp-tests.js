@@ -11,6 +11,7 @@ describe("Unit Tests - sftp.js", function() {
         "host": "",
         "port": 1,
         "remoteFilePath": "some_file.txt",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -56,13 +57,12 @@ describe("Unit Tests - sftp.js", function() {
       readable.push(null);
     });
 
-    // todo: this proves something is wrong with our error handling
-    // todo: cry a little but then fix it
     it("should reject if get method fails", function(done) {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
         "remoteFilePath": "some_file.txt",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -101,7 +101,8 @@ describe("Unit Tests - sftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFilePath": "some_file.txt",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -140,6 +141,7 @@ describe("Unit Tests - sftp.js", function() {
         "host": "",
         "port": 1,
         "remoteFilePath": "some_file.txt",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -183,7 +185,8 @@ describe("Unit Tests - sftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFilePath": "some_file.txt",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -226,7 +229,8 @@ describe("Unit Tests - sftp.js", function() {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFilePath": "some_file.txt",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };

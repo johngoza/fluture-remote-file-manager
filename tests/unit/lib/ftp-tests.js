@@ -11,6 +11,7 @@ describe("Unit Tests - ftp.js", function() {
         "host": "",
         "port": 1,
         "remoteFilePath": "",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -33,6 +34,7 @@ describe("Unit Tests - ftp.js", function() {
         "host": "",
         "port": 1,
         "remoteFilePath": "",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -74,6 +76,7 @@ describe("Unit Tests - ftp.js", function() {
         "host": "",
         "port": 1,
         "remoteFilePath": "",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -104,6 +107,7 @@ describe("Unit Tests - ftp.js", function() {
         "host": "",
         "port": 1,
         "remoteFilePath": "",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -134,10 +138,10 @@ describe("Unit Tests - ftp.js", function() {
         "host": "",
         "port": 1,
         "remoteFilePath": "",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
-
       const mockFtpClient = new EventEmitter();
       mockFtpClient.connect = (connectionconfiguration) => {
         mockFtpClient.emit("ready");
@@ -157,6 +161,7 @@ describe("Unit Tests - ftp.js", function() {
         "host": "",
         "port": 1,
         "remoteFilePath": "",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -186,6 +191,7 @@ describe("Unit Tests - ftp.js", function() {
         "host": "",
         "port": 1,
         "remoteFilePath": "",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -215,6 +221,7 @@ describe("Unit Tests - ftp.js", function() {
         "host": "",
         "port": 1,
         "remoteFilePath": "",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };

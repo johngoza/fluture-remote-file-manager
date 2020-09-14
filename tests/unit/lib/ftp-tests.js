@@ -1,8 +1,7 @@
 const EventEmitter = require("events");
-const Future = require("fluture");
 const {expect} = require("chai");
+const {Future, fork} = require("fluture");
 const {getFileViaFtp, sendFileViaFtp} = require("../../../lib/ftp.js");
-const {fork} = Future;
 const {Readable} = require("stream");
 
 describe("Unit Tests - ftp.js", function() {
@@ -71,6 +70,36 @@ describe("Unit Tests - ftp.js", function() {
     });
 
     it("should reject if get fails", function(done) {
+      const fakeConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFilePath": "",
+        "user": "",
+        "password": "",
+      };
+
+      const errorMessage = {"code": "503", "message": "get failed"};
+
+      const mockFtpClient = new EventEmitter();
+      mockFtpClient.connect = (config) => {
+        mockFtpClient.emit("ready");
+      };
+      mockFtpClient.put = () => { };
+      mockFtpClient.get = (p, cb) => {
+        cb(errorMessage, null);
+      };
+      mockFtpClient.end = () => { };
+
+      fork
+      (err => {
+        expect(err).to.equal("503 get failed");
+        done();
+      })
+      (done)
+      (getFileViaFtp(mockFtpClient)(fakeConnectionConfig));
+    });
+
+    it("should reject if the client throws an error during get", function(done) {
       const fakeConnectionConfig = {
         "host": "",
         "port": 1,

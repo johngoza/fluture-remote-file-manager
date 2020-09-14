@@ -11,7 +11,7 @@ describe("Integration Tests", function() {
   describe("forwardToGetMethod", function() {
     it("should reject if the desired get method is not found", function(done) {
       const mockConnectionConfig = {
-        "host": "",
+        "host": "hostname",
         "port": 1,
         "remoteFilePath": "file.txt",
         "user": "",
@@ -37,12 +37,12 @@ describe("Integration Tests", function() {
         done();
       })
       (done)
-      (forwardToGetMethod("some-get-method")(mockConnectionConfig)(mockGetFunctions));
+      (forwardToGetMethod("some-get-method")(mockGetFunctions)(mockConnectionConfig));
     });
 
     it("should route to ftp", function(done) {
       const mockConnectionConfig = {
-        "host": "",
+        "host": "hostname",
         "port": 1,
         "remoteFilePath": "file.txt",
         "user": "",
@@ -71,8 +71,6 @@ describe("Integration Tests", function() {
         },
       };
 
-      const forkableFunction = forwardToGetMethod("ftp")(mockConnectionConfig)(mockGetFunctions);
-
       const validateResult = data => {
         let result = "";
 
@@ -91,12 +89,12 @@ describe("Integration Tests", function() {
         done(err);
       })
       (validateResult)
-      (forkableFunction);
+      (forwardToGetMethod("ftp")(mockGetFunctions)(mockConnectionConfig));
     });
 
     it("should route to sftp", function(done) {
       const mockConnectionConfig = {
-        "host": "",
+        "host": "hostname",
         "port": 1,
         "remoteFilePath": "file.txt",
         "user": "",
@@ -128,8 +126,6 @@ describe("Integration Tests", function() {
         },
       };
 
-      const forkableFunction = forwardToGetMethod("sftp")(mockConnectionConfig)(mockGetFunctions);
-
       const validateResult = data => {
         let result = "";
 
@@ -146,24 +142,43 @@ describe("Integration Tests", function() {
       fork
       (done)
       (validateResult)
-      (forkableFunction);
+      (forwardToGetMethod("sftp")(mockGetFunctions)(mockConnectionConfig));
 
+      readable.emit("ready");
       readable.push("hello world");
       readable.push(null);
     });
   });
 
   describe("getFile", function() {
-    it("should route to ftp", function(done) {
+    it("should reject is the connectionConfig is invalid", function(done) {
       const mockConnectionConfig = {
         "host": "",
+        "port": 1,
+        "remoteFilePath": "",
+        "user": "",
+        "password": "",
+      };
+
+      const expectedResult = ["host is missing or invalid", "remoteFilePath is missing or invalid"];
+
+      fork
+      (err => {
+        expect(err).to.deep.equal(expectedResult);
+        done();
+      })
+      (done)
+      (getFile ("ftp") (mockConnectionConfig));
+    });
+
+    it("should route to ftp", function(done) {
+      const mockConnectionConfig = {
+        "host": "localhost",
         "port": 1,
         "remoteFilePath": "file.txt",
         "user": "",
         "password": "",
       };
-
-      const forkableFunction = getFile ("ftp") (mockConnectionConfig);
 
       fork
       (err => {
@@ -172,19 +187,17 @@ describe("Integration Tests", function() {
         done();
       })
       (done)
-      (forkableFunction);
+      (getFile ("ftp") (mockConnectionConfig));
     });
 
     it("should route to sftp", function(done) {
       const mockConnectionConfig = {
-        "host": "",
+        "host": "localhost",
         "port": 1,
         "remoteFilePath": "file.txt",
         "user": "",
         "password": "",
       };
-
-      const forkableFunction = getFile ("sftp") (mockConnectionConfig);
 
       fork
       (err => {
@@ -193,7 +206,7 @@ describe("Integration Tests", function() {
         done();
       })
       (done)
-      (forkableFunction);
+      (getFile ("sftp") (mockConnectionConfig));
     });
   });
 
@@ -226,7 +239,7 @@ describe("Integration Tests", function() {
         done();
       })
       (done)
-      (forwardToSendMethod("some-send-method")(mockConnectionConfig)(mockSendFunctions)(new Readable()));
+      (forwardToSendMethod("some-send-method") (mockSendFunctions) (mockConnectionConfig) (new Readable()));
     });
 
     it("should route to ftp", function(done) {
@@ -259,8 +272,6 @@ describe("Integration Tests", function() {
       readable.push("hello world");
       readable.push(null);
 
-      const forkableFunction = forwardToSendMethod ("ftp") (mockConnectionConfig) (mockSendFunctions) (readable);
-
       fork
       (err => {
         done(err);
@@ -269,7 +280,7 @@ describe("Integration Tests", function() {
         expect(data).to.deep.equal("Upload successful");
         done();
       })
-      (forkableFunction);
+      (forwardToSendMethod ("ftp") (mockSendFunctions) (mockConnectionConfig) (readable));
     });
 
     it("should route to sftp", function(done) {
@@ -310,8 +321,6 @@ describe("Integration Tests", function() {
       readable.push("hello world");
       readable.push(null);
 
-      const forkableFunction = forwardToSendMethod ("sftp") (mockConnectionConfig) (mockSendFunctions) (readable);
-
       fork
       (err => {
         done(err);
@@ -320,8 +329,9 @@ describe("Integration Tests", function() {
         expect(data).to.deep.equal("Upload successful");
         done();
       })
-      (forkableFunction);
+      (forwardToSendMethod ("sftp") (mockSendFunctions) (mockConnectionConfig) (readable));
 
+      passThrough.emit("ready");
       passThrough.emit("close");
     });
 
@@ -361,15 +371,13 @@ describe("Integration Tests", function() {
         },
       };
 
-      const forkableFunction = forwardToSendMethod ("email") (mockConfig) (mockSendFunctions) (new Readable());
-
       fork
       (done)
       (data => {
         expect(data).to.equal("Upload successful");
         done();
       })
-      (forkableFunction);
+      (forwardToSendMethod ("email") (mockSendFunctions) (mockConfig) (new Readable()));
     });
 
     it("should reject if an unsupported send method string is provided", function(done) {
@@ -388,8 +396,6 @@ describe("Integration Tests", function() {
         },
       };
 
-      const forkableFunction = forwardToSendMethod ("bar") (mockConnectionConfig) (mockSendFunctions) (new Readable());
-
       fork
       (err => {
         expect(err).to.equal("Send function not available");
@@ -398,30 +404,39 @@ describe("Integration Tests", function() {
       (data => {
         done("Expected an error but recieved " + data);
       })
-      (forkableFunction);
+      (forwardToSendMethod ("bar") (mockSendFunctions) (mockConnectionConfig) (new Readable()));
     });
   });
 
   describe("sendFile", function() {
-    it("should route to ftp", function(done) {
+    it("should reject is the connectionConfig is invalid", function(done) {
       const mockConnectionConfig = {
         "host": "",
+        "port": 1,
+        "remoteFilePath": "",
+        "user": "",
+        "password": "",
+      };
+
+      const expectedResult = ["host is missing or invalid", "remoteFilePath is missing or invalid"];
+
+      fork
+      (err => {
+        expect(err).to.deep.equal(expectedResult);
+        done();
+      })
+      (done)
+      (sendFile ("ftp") (mockConnectionConfig) ("tests/unit/resources/hello.txt"));
+    });
+
+    it("should route to ftp", function(done) {
+      const mockConnectionConfig = {
+        "host": "localhost",
         "port": 1,
         "remoteFilePath": "file.txt",
         "user": "",
         "password": "",
       };
-
-      const mockFtpClient = new EventEmitter();
-      mockFtpClient.connect = (connectionconfiguration) => {
-        mockFtpClient.emit("ready");
-      };
-      mockFtpClient.put = (readable, path, callback) => {
-        callback();
-      };
-      mockFtpClient.end = () => { };
-
-      const forkableFunction = sendFile ("ftp") (mockConnectionConfig) ("tests/unit/resources/hello.txt");
 
       fork
       (err => {
@@ -432,19 +447,17 @@ describe("Integration Tests", function() {
       (data => {
         done("Data should not be returned; Connection refused expected");
       })
-      (forkableFunction);
+      (sendFile ("ftp") (mockConnectionConfig) ("tests/unit/resources/hello.txt"));
     });
 
     it("should route to sftp", function(done) {
       const mockConnectionConfig = {
-        "host": "",
+        "host": "localhost",
         "port": 1,
         "remoteFilePath": "file.txt",
         "user": "",
         "password": "",
       };
-
-      const forkableFunction = sendFile ("sftp") (mockConnectionConfig) ("tests/unit/resources/hello.txt");
 
       fork
       (err => {
@@ -455,7 +468,7 @@ describe("Integration Tests", function() {
       (data => {
         done("Data should not be returned; Connection refused expected");
       })
-      (forkableFunction);
+      (sendFile ("sftp") (mockConnectionConfig) ("tests/unit/resources/hello.txt"));
     });
 
     it("should route to email", function(done) {
@@ -464,20 +477,19 @@ describe("Integration Tests", function() {
         "from": "",
         "subject": "",
         "text": "",
+        "content": "hello",
       };
 
       const mockConfig = {
-        "host": "",
+        "host": "localhost",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFilePath": "pathtofile",
         "auth": {
           "user": "",
           "pass": "",
         },
         "message": mockMessage,
       };
-
-      const forkableFunction = sendFile ("email") (mockConfig) ("tests/unit/resources/hello.txt");
 
       fork
       (err => {
@@ -486,7 +498,7 @@ describe("Integration Tests", function() {
         done();
       })
       (done)
-      (forkableFunction);
+      (sendFile ("email") (mockConfig) ("tests/unit/resources/hello.txt"));
     });
   });
 });

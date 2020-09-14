@@ -2,14 +2,14 @@ const $ = require("sanctuary-def");
 const fs = require("fs");
 const R = require("ramda");
 const {chain, reject} = require("fluture");
-const {createReadStream, getFunctions, sendFunctions} = require("./lib/utility-functions.js");
+const {createReadStream, getFunctions, sendFunctions, validateConnectionConfig} = require("./lib/utility-functions.js");
 const {def, ConnectionConfig, ReadStreamType} = require("./lib/sanctuary-environment.js");
 const {FutureType} = require("fluture-sanctuary-types");
 
 const forwardToGetMethod = def("forwardToGetMethod")
 ({})
-([$.String, ConnectionConfig, $.Object, FutureType ($.String) ($.String)])
-(getMethod => connectionConfig => getFunctions => {
+([$.String, $.Object, ConnectionConfig, FutureType ($.String) ($.String)])
+(getMethod => getFunctions => connectionConfig => {
   const methodLens = R.lensPath([getMethod, "method"]);
   const gettingFunction = R.view(methodLens, getFunctions);
   const clientLens = R.lensPath([getMethod, "client"]);
@@ -26,13 +26,13 @@ const getFile = def("getFile")
 ({})
 ([$.String, ConnectionConfig, FutureType($.String)($.Any)])
 (getMethod => connectionConfig => {
-  return forwardToGetMethod(getMethod) (connectionConfig) (getFunctions);
+  return chain (forwardToGetMethod(getMethod) (getFunctions)) (validateConnectionConfig(connectionConfig));
 });
 
 const forwardToSendMethod = def("forwardToSendMethod")
 ({})
-([$.String, ConnectionConfig, $.Object, ReadStreamType, FutureType ($.String) ($.String)])
-(sendMethod => connectionConfig => sendFunctions => readStream => {
+([$.String, $.Object, ConnectionConfig, ReadStreamType, FutureType ($.String) ($.String)])
+(sendMethod => sendFunctions => connectionConfig => readStream => {
   const methodLens = R.lensPath([sendMethod, "method"]);
   const sendingFunction = R.view(methodLens, sendFunctions);
   const clientLens = R.lensPath([sendMethod, "client"]);
@@ -45,12 +45,16 @@ const forwardToSendMethod = def("forwardToSendMethod")
     : sendingFunction(client)(readStream)(connectionConfig);
 });
 
-const sendFile = def("sendFile")
+const injectFileReadStream = def("injectFileReadStream")
 ({})
-([$.String, ConnectionConfig, $.String, FutureType($.String)($.String)])
-(sendMethod => connectionConfig => fileName => {
-  return chain (forwardToSendMethod(sendMethod) (connectionConfig) (sendFunctions)) (createReadStream(fs, fileName));
+([$.String, $.String, ConnectionConfig, FutureType($.String)($.String)])
+(sendMethod => fileName => connectionConfig => {
+  return chain (forwardToSendMethod(sendMethod) (sendFunctions) (connectionConfig)) (createReadStream(fs) (fileName));
 });
+
+const sendFile = sendMethod => connectionConfig => fileName => {
+  return chain (injectFileReadStream(sendMethod)(fileName)) (validateConnectionConfig(connectionConfig));
+};
 
 module.exports = {
   forwardToGetMethod,

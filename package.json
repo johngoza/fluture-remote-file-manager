@@ -1,6 +1,6 @@
 {
   "name": "@q6-enterprises-inc/fluture-remote-file-manager",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Future returning, easy way of sending or retrieving files.",
   "main": "index.js",
   "files": [
@@ -42,6 +42,7 @@
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-sort-requires": "2.1.0",
     "eslint-plugin-standard": "4.0.1",
+    "mailparser": "3.0.0",
     "mocha": "8.1.3",
     "nyc": "15.1.0",
     "smtp-server": "3.7.0"

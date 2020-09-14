@@ -1,11 +1,7 @@
 const expect = require("chai").expect;
-const NodeMailer = require("nodemailer");
 const path = require("path");
-const Readable = require("stream").Readable;
 const {fork} = require("fluture");
-const {sendFileViaEmail} = require(path.join(__dirname, "../../../lib/email.js"));
-
-// todo: update existing tests to use index functions rather than directly reference the library
+const {sendFile} = require(path.join(__dirname, "../../../index.js"));
 
 // The expect wrapped in a try/catch is bad practice
 // but is unfortunately required as smtpserver changes the context
@@ -35,7 +31,7 @@ describe("SYSTEM TESTS - email.js", function() {
         "message": message,
       };
 
-      const readable = new Readable();
+      const filepath = "tests/system/resources/hello.txt";
 
       fork
       (err => {
@@ -43,17 +39,13 @@ describe("SYSTEM TESTS - email.js", function() {
       })
       (data => {
         try {
-          expect(data.response).to.deep.equal("250 accepted");
+          expect(data.response).to.deep.equal("250 hello world");
           done();
         } catch (err) {
           done(err);
         }
       })
-      (sendFileViaEmail(NodeMailer) (readable) (config));
-
-      readable.push("hello world");
-      readable.push(null);
-      readable.emit("end");
+      (sendFile("email")(config)(filepath));
     });
   });
 });

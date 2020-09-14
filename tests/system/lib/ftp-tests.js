@@ -2,11 +2,8 @@ const chai = require("chai");
 const expect = chai.expect;
 const Ftp = require("ftp");
 const path = require("path");
-const Readable = require("stream").Readable;
 const {fork} = require("fluture");
-const {getFileViaFtp, sendFileViaFtp} = require(path.join(__dirname, "../../../lib/ftp.js"));
-
-// todo: update existing tests to use index functions rather than directly reference the library
+const {getFile, sendFile} = require(path.join(__dirname, "../../../index.js"));
 
 describe("SYSTEM TESTS - ftp.js", function() {
   describe("getFileViaFtp", function() {
@@ -36,7 +33,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
           done();
         });
       })
-      (getFileViaFtp(new Ftp())(connectionConfig));
+      (getFile("ftp")(connectionConfig));
     });
 
     it("should reject if the server throws an error", function(done) {
@@ -57,7 +54,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
         done();
       })
       (done)
-      (getFileViaFtp(new Ftp())(connectionConfig));
+      (getFile("ftp")(connectionConfig));
     });
   });
 
@@ -73,7 +70,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
         "password": "password",
       };
 
-      const verifyResults = (ftpClient, data, expected) => {
+      const verifyResults = (ftpClient, data) => {
         expect(data).to.deep.equal("Upload successful");
 
         let finalVal;
@@ -100,18 +97,15 @@ describe("SYSTEM TESTS - ftp.js", function() {
         ftpClient.connect(connectionConfig);
       };
 
-      const readable = new Readable();
+      const filepath = "tests/system/resources/hello.txt";
 
       fork
       (done)
       (data => {
-        verifyResults(new Ftp(), data, readable);
+        verifyResults(new Ftp(), data);
         done();
       })
-      (sendFileViaFtp(new Ftp())(readable)(connectionConfig));
-
-      readable.push("hello world");
-      readable.push(null);
+      (sendFile("ftp")(connectionConfig)(filepath));
     });
 
     it("should reject if the server throws an error", function(done) {
@@ -126,7 +120,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
         "password": "",
       };
 
-      const readable = new Readable();
+      const filepath = "tests/system/resources/hello.txt";
 
       fork
       (err => {
@@ -134,10 +128,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
         done();
       })
       (done)
-      (sendFileViaFtp(new Ftp())(readable)(connectionConfig));
-
-      readable.push("hello world");
-      readable.push(null);
+      (sendFile("ftp")(connectionConfig)(filepath));
     });
   });
 
@@ -192,18 +183,14 @@ describe("SYSTEM TESTS - ftp.js", function() {
         ftpClient.connect(connectionConfig);
       };
 
-      const readable = new Readable();
+      const filepath = "tests/system/resources/hello.txt";
 
       fork
       (done)
       (data => {
         verifyResults(data);
       })
-      (sendFileViaFtp(new Ftp())(readable)(connectionConfig));
-
-      readable.push("hello world");
-      readable.push(null);
-      readable.destroy();
+      (sendFile("ftp")(connectionConfig)(filepath));
     });
 
     it("should reject if the ftps server throws an error", function(done) {
@@ -220,7 +207,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
         "secureOptions": {"rejectUnauthorized": false},
       };
 
-      const readable = new Readable();
+      const filepath = "tests/system/resources/hello.txt";
 
       fork
       (err => {
@@ -228,10 +215,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
         done();
       })
       (done)
-      (sendFileViaFtp(new Ftp())(readable)(connectionConfig));
-
-      readable.push("hello world");
-      readable.push(null);
+      (sendFile("ftp")(connectionConfig)(filepath));
     });
   });
 });

@@ -51,10 +51,13 @@ describe("Unit Tests - sftp.js", function() {
       (validateResults)
       (getFileViaSftp(mockSftpClient)(fakeConnectionConfig));
 
+      readable.emit("ready");
       readable.push("hello world");
       readable.push(null);
     });
 
+    // todo: this proves something is wrong with our error handling
+    // todo: cry a little but then fix it
     it("should reject if get method fails", function(done) {
       const fakeConnectionConfig = {
         "host": "",
@@ -69,7 +72,7 @@ describe("Unit Tests - sftp.js", function() {
 
       const sftp = {
         "createReadStream": (remoteFilePath) => {
-          readable.emit("error");
+          return readable;
         },
       };
 
@@ -84,14 +87,14 @@ describe("Unit Tests - sftp.js", function() {
 
       fork
       (err => {
-        expect(err.toString()).to.deep.equal("Error [ERR_UNHANDLED_ERROR]: Unhandled error. (undefined)");
+        expect(err).to.deep.equal({"code": "503", "message": "get failed"});
         done();
       })
       (done)
       (getFileViaSftp(mockSftpClient)(fakeConnectionConfig));
 
-      readable.push("hello world");
-      readable.push(null);
+      readable.emit("error", {"code": "503", "message": "get failed"});
+      readable.destroy();
     });
 
     it("should reject if there is an error getting the sftp client", function(done) {
@@ -172,6 +175,7 @@ describe("Unit Tests - sftp.js", function() {
       (done)
       (verifyResult)
       (sendFileViaSftp(mockSftpClient)(readable)(fakeConnectionConfig));
+      passThrough.emit("ready");
       passThrough.emit("close");
     });
 

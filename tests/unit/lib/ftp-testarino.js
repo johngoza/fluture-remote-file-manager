@@ -1,28 +1,36 @@
 // const Client = require("ftp");
 // const crypto = require("crypto");
-// const R = require("ramda");
+// const fs = require("fs");
+// const S = require("sanctuary");
+// const {fork} = require("fluture");
+// const {getFileMetadata, filterFileMetadata, verifyFile} = require("../../../lib/ftp");
 
 // const connectionConfig = {
 //   "host": "localhost",
 //   "port": 21,
 //   "user": "user",
 //   "password": "password",
+//   "remoteFileName": "hello.txt",
+//   "remoteDirectory": "/",
 // };
 
-// const c = new Client();
-// c.on("ready", function() {
-//   c.list("/ftp/user", function(err, list) {
-//     if (err) throw err;
-//     // console.dir(list);
+// const fileList = [
+//   {
+//     "type": "-",
+//     "name": "hello.txt",
+//   },
+//   {
+//     "type": "d",
+//     "name": "home",
+//   },
+// ];
 
-//     const filtered = R.filter(x => x.name === "hello.txt", list);
-//     console.log(filtered);
+// const writeStream = fs.createWriteStream("helloooo.txt");
 
-//     const hasher = crypto.createHash("md5");
-//     const hashed = hasher.update(filtered.toString()).digest("hex");
-//     console.log(hashed);
-//     c.end();
-//   });
-// });
-
-// c.connect(connectionConfig);
+// fork
+// (console.log)
+// (stream => {
+//   console.log("data");
+//   stream.pipe(writeStream);
+// })
+// (verifyFile(new Client())(connectionConfig));

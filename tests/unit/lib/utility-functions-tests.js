@@ -1,10 +1,24 @@
 const EventEmitter = require("events");
 const fs = require("fs");
-const {createReadStream, validateConnectionConfig} = require("../../../lib/utility-functions.js");
+const {createObjectHash, createReadStream, validateConnectionConfig} = require("../../../lib/utility-functions.js");
 const {expect} = require("chai");
 const {fork} = require("fluture");
 
 describe("Unit Tests - UtilityFunctions", function() {
+  describe("createObjectHash", function() {
+    it("should return the same string when provided the same object", function() {
+      const object = {
+        "hello": "world",
+        "hash": "me",
+      };
+
+      const firstHash = createObjectHash(JSON.stringify(object));
+      const secondHash = createObjectHash(JSON.stringify(object));
+
+      expect(firstHash).to.deep.equal(secondHash);
+    });
+  });
+
   describe("createReadStream", function() {
     it("should not break fs read functionality", function(done) {
       const verifyResults = (readStream) => {

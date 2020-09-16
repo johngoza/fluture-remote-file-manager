@@ -6,6 +6,7 @@ const {
   getFileViaFtp,
   sendFileViaFtp,
   setupConnection,
+  verifyAndGetFile,
 } = require("../../../lib/ftp.js");
 const {expect} = require("chai");
 const {Future, fork} = require("fluture");
@@ -109,7 +110,6 @@ describe("Unit Tests - ftp.js", function() {
       (getFileViaFtp(mockFtpClient)(mockConnectionConfig));
     });
 
-    // todo: this proves the error handling is broken
     it("should reject if the client throws an error during get", function(done) {
       const mockConnectionConfig = {
         "host": "",
@@ -163,6 +163,11 @@ describe("Unit Tests - ftp.js", function() {
           cb(null, mockFileList);
         },
       };
+      mockFtpClient.connect = (config) => { };
+      mockFtpClient.on = () => { };
+      mockFtpClient.put = () => { };
+      mockFtpClient.get = () => { };
+      mockFtpClient.end = () => { };
 
       fork
       (done)
@@ -196,6 +201,7 @@ describe("Unit Tests - ftp.js", function() {
       };
       mockFtpClient.connect = () => { };
       mockFtpClient.get = () => { };
+      mockFtpClient.on = () => { };
       mockFtpClient.put = () => { };
       mockFtpClient.end = () => { };
 
@@ -509,7 +515,7 @@ describe("Unit Tests - ftp.js", function() {
           done();
         });
       })
-      (getFileViaFtp(mockFtpClient)(mockConnectionConfig));
+      (verifyAndGetFile(mockFtpClient)(mockConnectionConfig));
 
       readable.push("hello world");
       readable.push(null);
@@ -556,10 +562,9 @@ describe("Unit Tests - ftp.js", function() {
         done();
       })
       (done)
-      (getFileViaFtp(mockFtpClient)(mockConnectionConfig));
+      (verifyAndGetFile(mockFtpClient)(mockConnectionConfig));
     });
 
-    // todo: this proves the error handling is broken
     it("should reject if an error is encountered elsewhere", function(done) {
       const mockConnectionConfig = {
         "host": "",
@@ -569,13 +574,6 @@ describe("Unit Tests - ftp.js", function() {
         "user": "",
         "password": "",
       };
-
-      const mockFileList = [
-        {
-          "name": "hello.txt",
-          "size": "2 KB",
-        },
-      ];
 
       const mockError = {
         "message": "an error occurred",
@@ -603,7 +601,7 @@ describe("Unit Tests - ftp.js", function() {
         done();
       })
       (done)
-      (getFileViaFtp(mockFtpClient)(mockConnectionConfig));
+      (verifyAndGetFile(mockFtpClient)(mockConnectionConfig));
     });
   });
 });

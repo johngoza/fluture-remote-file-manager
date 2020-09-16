@@ -1,10 +1,47 @@
 const $ = require("sanctuary-def");
 const fs = require("fs");
+const FtpClient = require("ftp");
+const NodeMailer = require("nodemailer");
 const R = require("ramda");
+const SftpClient = require("ssh2").Client;
 const {chain, reject} = require("fluture");
-const {createReadStream, getFunctions, sendFunctions, validateConnectionConfig} = require("./lib/utility-functions.js");
+const {createReadStream, validateConnectionConfig} = require("./lib/utility-functions.js");
 const {def, ConnectionConfig, ReadStreamType} = require("./lib/sanctuary-environment.js");
 const {FutureType} = require("fluture-sanctuary-types");
+const {getFileViaSftp, sendFileViaSftp} = require("./lib/sftp");
+const {sendFileViaEmail} = require("./lib/email");
+const {verifyAndGetFile, sendFileViaFtp} = require("./lib/ftp");
+
+const getFunctions = {
+  "ftp": {
+    "method": verifyAndGetFile,
+    "client": new FtpClient(),
+  },
+  "sftp": {
+    "method": getFileViaSftp,
+    "client": new SftpClient(),
+  },
+};
+
+// todo: change the send and get functions to return a constructed call rather than references
+// const sendFunctions = method => config => {
+//
+// }
+
+const sendFunctions = {
+  "ftp": {
+    "method": sendFileViaFtp,
+    "client": new FtpClient(),
+  },
+  "sftp": {
+    "method": sendFileViaSftp,
+    "client": new SftpClient(),
+  },
+  "email": {
+    "method": sendFileViaEmail,
+    "client": NodeMailer,
+  },
+};
 
 const forwardToGetMethod = def("forwardToGetMethod")
 ({})

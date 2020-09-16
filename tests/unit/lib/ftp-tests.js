@@ -7,6 +7,7 @@ const {
   sendFileViaFtp,
   setupConnection,
   verifyAndGetFile,
+  verifyFileSignature,
 } = require("../../../lib/ftp.js");
 const {expect} = require("chai");
 const {Future, fork} = require("fluture");
@@ -602,6 +603,104 @@ describe("Unit Tests - ftp.js", function() {
       })
       (done)
       (verifyAndGetFile(mockFtpClient)(mockConnectionConfig));
+    });
+  });
+
+  describe("verifyFileSignature", function() {
+    it("should put a signature on the connection config if one is not present", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFileName": "",
+        "remoteDirectory": "",
+        "user": "",
+        "password": "",
+      };
+
+      const mockFileMetadata = S.Just({
+        "name": "hello.txt",
+        "size": "1776 MB",
+      });
+
+      const expectedResult = {
+        "host": "",
+        "port": 1,
+        "remoteFileName": "",
+        "remoteDirectory": "",
+        "user": "",
+        "password": "",
+        "fileSignature": "ff041f15a778695c5bae0d39c862b135",
+      };
+
+      fork
+      (done)
+      (data => {
+        expect(data).to.deep.equal(expectedResult);
+        done();
+      })
+      (verifyFileSignature(mockConnectionConfig)(mockFileMetadata));
+    });
+
+    it("should resolve with the connection config if signatures match", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFileName": "",
+        "remoteDirectory": "",
+        "user": "",
+        "password": "",
+        "fileSignature": "ff041f15a778695c5bae0d39c862b135",
+      };
+
+      const mockFileMetadata = S.Just({
+        "name": "hello.txt",
+        "size": "1776 MB",
+      });
+
+      const expectedResult = {
+        "host": "",
+        "port": 1,
+        "remoteFileName": "",
+        "remoteDirectory": "",
+        "user": "",
+        "password": "",
+        "fileSignature": "ff041f15a778695c5bae0d39c862b135",
+      };
+
+      fork
+      (done)
+      (data => {
+        expect(data).to.deep.equal(expectedResult);
+        done();
+      })
+      (verifyFileSignature(mockConnectionConfig)(mockFileMetadata));
+    });
+
+    it("should reject with an error if signatures don't match", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFileName": "",
+        "remoteDirectory": "",
+        "user": "",
+        "password": "",
+        "fileSignature": "not-a-real-signature",
+      };
+
+      const mockFileMetadata = S.Just({
+        "name": "hello.txt",
+        "size": "1776 MB",
+      });
+
+      const expectedResult = "File metadata changed while attempting GET. File is not currently viable for consumption";
+
+      fork
+      (err => {
+        expect(err).to.deep.equal(expectedResult);
+        done();
+      })
+      (done)
+      (verifyFileSignature(mockConnectionConfig)(mockFileMetadata));
     });
   });
 });

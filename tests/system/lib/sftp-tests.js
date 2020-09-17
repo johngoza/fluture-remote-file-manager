@@ -83,7 +83,7 @@ describe("SYSTEM TESTS - sftp.js", function() {
       const connectionConfig = {
         "host": "sftp-server",
         "port": 22,
-        "remoteDirectory": "/",
+        "remoteDirectory": "/home/user",
         "remoteFileName": "hello.txt",
         "user": "user",
         "password": "password",
@@ -114,7 +114,7 @@ describe("SYSTEM TESTS - sftp.js", function() {
       const connectionConfig = {
         "host": "sftp-server",
         "port": 22,
-        "remoteDirectory": "/",
+        "remoteDirectory": "/home/user/",
         "remoteFileName": "hello.txt",
         "user": "user",
         "privateKey": privateKey,

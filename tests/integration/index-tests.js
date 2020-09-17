@@ -1,11 +1,11 @@
 const EventEmitter = require("events");
 const {expect} = require("chai");
 const {fork} = require("fluture");
-const {forwardToGetMethod, forwardToSendMethod, getFile, sendFile} = require("../../index.js");
-const {getFileViaFtp, sendFileViaFtp} = require("../../lib/ftp.js");
-const {getFileViaSftp, sendFileViaSftp} = require("../../lib/sftp.js");
+const {forwardToGetMethod, forwardToSendMethod, getFile, sendFile} = require("../../index");
+const {getFileViaFtp, sendFileViaFtp} = require("../../lib/ftp");
+const {getFileViaSftp, sendFileViaSftp} = require("../../lib/sftp");
 const {Readable, PassThrough} = require("stream");
-const {sendFileViaEmail} = require("../../lib/email.js");
+const {sendFileViaEmail} = require("../../lib/email");
 
 describe("Integration Tests", function() {
   describe("forwardToGetMethod", function() {
@@ -64,6 +64,7 @@ describe("Integration Tests", function() {
       mockFtpClient.get = (path, callback) => {
         callback(null, readable);
       };
+      mockFtpClient.list = () => { };
       mockFtpClient.end = () => { };
 
       const mockGetFunctions = {
@@ -254,6 +255,7 @@ describe("Integration Tests", function() {
       mockFtpClient.put = (readable, path, callback) => {
         callback();
       };
+      mockFtpClient.list = () => { };
       mockFtpClient.end = () => { };
 
       const mockSendFunctions = {
@@ -264,7 +266,6 @@ describe("Integration Tests", function() {
       };
 
       const readable = new Readable();
-      readable.push("hello world");
       readable.push(null);
 
       fork

@@ -1,14 +1,11 @@
 const EventEmitter = require("events");
-const S = require("sanctuary");
 const {
   getFileMetadata,
-  filterFileMetadata,
   getFileViaFtp,
   sendFileViaFtp,
   setupConnection,
-  verifyAndGetFile,
-  verifyFileSignature,
-} = require("../../../lib/ftp.js");
+  verifyAndGetFileViaFtp,
+} = require("../../../lib/ftp");
 const {expect} = require("chai");
 const {Future, fork} = require("fluture");
 const {Readable} = require("stream");
@@ -33,6 +30,7 @@ describe("Unit Tests - ftp.js", function() {
       mockFtpClient.get = () => {
         return "get failed";
       };
+      mockFtpClient.list = () => { };
       mockFtpClient.end = () => { };
 
       expect(getFileViaFtp(mockFtpClient)(mockConnectionConfig)).to.be.instanceOf(Future);
@@ -58,6 +56,7 @@ describe("Unit Tests - ftp.js", function() {
       mockFtpClient.get = (path, callback) => {
         callback(null, readable);
       };
+      mockFtpClient.list = () => { };
       mockFtpClient.end = () => { };
 
       fork
@@ -100,6 +99,7 @@ describe("Unit Tests - ftp.js", function() {
       mockFtpClient.get = (p, cb) => {
         cb(errorMessage, null);
       };
+      mockFtpClient.list = () => { };
       mockFtpClient.end = () => { };
 
       fork
@@ -129,6 +129,7 @@ describe("Unit Tests - ftp.js", function() {
       mockFtpClient.get = (p, cb) => {
         mockFtpClient.emit("error", {"code": "503", "message": "get failed"});
       };
+      mockFtpClient.list = () => { };
       mockFtpClient.end = () => { };
 
       fork
@@ -216,75 +217,6 @@ describe("Unit Tests - ftp.js", function() {
     });
   });
 
-  describe("filterFileMetadata", function() {
-    it("should resolve with the only the specific file's metadata if present", function(done) {
-      const mockConnectionConfig = {
-        "host": "",
-        "port": 1,
-        "remoteFileName": "hello.txt",
-        "remoteDirectory": "",
-        "user": "",
-        "password": "",
-      };
-
-      const mockFileList = [
-        {
-          "name": "hello.txt",
-          "size": "1776 KB",
-        },
-        {
-          "name": "other-file.txt",
-          "size": "3 MB",
-        },
-      ];
-
-      const expectedData = S.Just({
-        "name": "hello.txt",
-        "size": "1776 KB",
-      });
-
-      fork
-      (done)
-      (data => {
-        expect(data).to.deep.equal(expectedData);
-        done();
-      })
-      (filterFileMetadata(mockConnectionConfig)(mockFileList));
-    });
-
-    it("should reject with descriptive error if file isn't present", function(done) {
-      const mockConnectionConfig = {
-        "host": "",
-        "port": 1,
-        "remoteFileName": "hello.txt",
-        "remoteDirectory": "/",
-        "user": "",
-        "password": "",
-      };
-
-      const mockFileList = [
-        {
-          "name": "file.txt",
-          "size": "2 KB",
-        },
-        {
-          "name": "other-file.txt",
-          "size": "3 MB",
-        },
-      ];
-
-      const expectedError = "file hello.txt not found on remote in directory /";
-
-      fork
-      (err => {
-        expect(err).to.deep.equal(expectedError);
-        done();
-      })
-      (done)
-      (filterFileMetadata(mockConnectionConfig)(mockFileList));
-    });
-  });
-
   describe("sendFileViaFtp", function() {
     it("should return a future", function() {
       const mockConnectionConfig = {
@@ -304,6 +236,7 @@ describe("Unit Tests - ftp.js", function() {
       mockFtpClient.put = () => {
         return "put failed";
       };
+      mockFtpClient.list = () => { };
       mockFtpClient.end = () => { };
 
       expect(sendFileViaFtp(mockFtpClient)(new Readable())(mockConnectionConfig)).to.be.instanceOf(Future);
@@ -325,6 +258,7 @@ describe("Unit Tests - ftp.js", function() {
       };
       mockFtpClient.on("ready", () => { });
       mockFtpClient.get = () => { };
+      mockFtpClient.list = () => { };
       mockFtpClient.put = (file, path, callback) => {
         callback();
       };
@@ -355,6 +289,7 @@ describe("Unit Tests - ftp.js", function() {
       };
       mockFtpClient.on("ready", () => { });
       mockFtpClient.get = () => { };
+      mockFtpClient.list = () => { };
       mockFtpClient.put = (f, p, cb) => {
         mockFtpClient.emit("error", {"code": "503", "message": "put failed"});
       };
@@ -387,6 +322,7 @@ describe("Unit Tests - ftp.js", function() {
       };
       mockFtpClient.on("ready", () => { });
       mockFtpClient.get = () => { };
+      mockFtpClient.list = () => { };
       mockFtpClient.put = (f, p, cb) => {
         cb(mockedError);
       };
@@ -418,6 +354,7 @@ describe("Unit Tests - ftp.js", function() {
         mockFtpClient.emit("ready");
       };
       mockFtpClient.get = () => { };
+      mockFtpClient.list = () => { };
       mockFtpClient.put = () => { };
       mockFtpClient.end = () => { };
 
@@ -450,6 +387,7 @@ describe("Unit Tests - ftp.js", function() {
         mockFtpClient.emit("error", mockError);
       };
       mockFtpClient.get = () => { };
+      mockFtpClient.list = () => { };
       mockFtpClient.put = () => { };
       mockFtpClient.end = () => { };
 
@@ -516,7 +454,7 @@ describe("Unit Tests - ftp.js", function() {
           done();
         });
       })
-      (verifyAndGetFile(mockFtpClient)(mockConnectionConfig));
+      (verifyAndGetFileViaFtp(mockFtpClient)(mockConnectionConfig));
 
       readable.push("hello world");
       readable.push(null);
@@ -563,7 +501,7 @@ describe("Unit Tests - ftp.js", function() {
         done();
       })
       (done)
-      (verifyAndGetFile(mockFtpClient)(mockConnectionConfig));
+      (verifyAndGetFileViaFtp(mockFtpClient)(mockConnectionConfig));
     });
 
     it("should reject if an error is encountered elsewhere", function(done) {
@@ -602,105 +540,7 @@ describe("Unit Tests - ftp.js", function() {
         done();
       })
       (done)
-      (verifyAndGetFile(mockFtpClient)(mockConnectionConfig));
-    });
-  });
-
-  describe("verifyFileSignature", function() {
-    it("should put a signature on the connection config if one is not present", function(done) {
-      const mockConnectionConfig = {
-        "host": "",
-        "port": 1,
-        "remoteFileName": "",
-        "remoteDirectory": "",
-        "user": "",
-        "password": "",
-      };
-
-      const mockFileMetadata = S.Just({
-        "name": "hello.txt",
-        "size": "1776 MB",
-      });
-
-      const expectedResult = {
-        "host": "",
-        "port": 1,
-        "remoteFileName": "",
-        "remoteDirectory": "",
-        "user": "",
-        "password": "",
-        "fileSignature": "ff041f15a778695c5bae0d39c862b135",
-      };
-
-      fork
-      (done)
-      (data => {
-        expect(data).to.deep.equal(expectedResult);
-        done();
-      })
-      (verifyFileSignature(mockConnectionConfig)(mockFileMetadata));
-    });
-
-    it("should resolve with the connection config if signatures match", function(done) {
-      const mockConnectionConfig = {
-        "host": "",
-        "port": 1,
-        "remoteFileName": "",
-        "remoteDirectory": "",
-        "user": "",
-        "password": "",
-        "fileSignature": "ff041f15a778695c5bae0d39c862b135",
-      };
-
-      const mockFileMetadata = S.Just({
-        "name": "hello.txt",
-        "size": "1776 MB",
-      });
-
-      const expectedResult = {
-        "host": "",
-        "port": 1,
-        "remoteFileName": "",
-        "remoteDirectory": "",
-        "user": "",
-        "password": "",
-        "fileSignature": "ff041f15a778695c5bae0d39c862b135",
-      };
-
-      fork
-      (done)
-      (data => {
-        expect(data).to.deep.equal(expectedResult);
-        done();
-      })
-      (verifyFileSignature(mockConnectionConfig)(mockFileMetadata));
-    });
-
-    it("should reject with an error if signatures don't match", function(done) {
-      const mockConnectionConfig = {
-        "host": "",
-        "port": 1,
-        "remoteFileName": "",
-        "remoteDirectory": "",
-        "user": "",
-        "password": "",
-        "fileSignature": "not-a-real-signature",
-      };
-
-      const mockFileMetadata = S.Just({
-        "name": "hello.txt",
-        "size": "1776 MB",
-      });
-
-      const expectedResult = "File metadata changed while attempting GET. File is not currently viable for consumption";
-
-      fork
-      (err => {
-        expect(err).to.deep.equal(expectedResult);
-        done();
-      })
-      (done)
-      (verifyFileSignature(mockConnectionConfig)(mockFileMetadata));
+      (verifyAndGetFileViaFtp(mockFtpClient)(mockConnectionConfig));
     });
   });
 });

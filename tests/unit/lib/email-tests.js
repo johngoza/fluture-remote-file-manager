@@ -1,7 +1,7 @@
 const EventEmitter = require("events");
 const Future = require("fluture");
 const {expect} = require("chai");
-const {sendFileViaEmail} = require("../../../lib/email.js");
+const {sendFileViaEmail} = require("../../../lib/email");
 const {fork} = Future;
 const {Readable} = require("stream");
 

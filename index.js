@@ -8,17 +8,17 @@ const {chain, reject} = require("fluture");
 const {createReadStream, validateConnectionConfig} = require("./lib/utility-functions.js");
 const {def, ConnectionConfig, ReadStreamType} = require("./lib/sanctuary-environment.js");
 const {FutureType} = require("fluture-sanctuary-types");
-const {getFileViaSftp, sendFileViaSftp} = require("./lib/sftp");
 const {sendFileViaEmail} = require("./lib/email");
-const {verifyAndGetFile, sendFileViaFtp} = require("./lib/ftp");
+const {verifyAndGetFileViaFtp, sendFileViaFtp} = require("./lib/ftp");
+const {verifyAndGetFileViaSftp, sendFileViaSftp} = require("./lib/sftp");
 
 const getFunctions = {
   "ftp": {
-    "method": verifyAndGetFile,
+    "method": verifyAndGetFileViaFtp,
     "client": new FtpClient(),
   },
   "sftp": {
-    "method": getFileViaSftp,
+    "method": verifyAndGetFileViaSftp,
     "client": new SftpClient(),
   },
 };

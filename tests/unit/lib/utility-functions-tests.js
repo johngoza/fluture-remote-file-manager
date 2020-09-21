@@ -1,15 +1,16 @@
 const EventEmitter = require("events");
 const fs = require("fs");
-const S = require("sanctuary");
 const {
   createObjectHash,
   createReadStream,
   filterFileMetadata,
+  rejectOnLeft,
   validateConnectionConfig,
   verifyFileSignature,
 } = require("../../../lib/utility-functions");
 const {expect} = require("chai");
 const {fork} = require("fluture");
+const {S} = require("../../../lib/sanctuary-environment");
 
 describe("Unit Tests - UtilityFunctions", function() {
   describe("createObjectHash", function() {
@@ -71,7 +72,7 @@ describe("Unit Tests - UtilityFunctions", function() {
   });
 
   describe("filterFileMetadata", function() {
-    it("should resolve with the only the specific file's metadata if present", function(done) {
+    it("should resolve with the only the specific file's metadata if present", function() {
       const mockConnectionConfig = {
         "host": "",
         "port": 1,
@@ -97,16 +98,11 @@ describe("Unit Tests - UtilityFunctions", function() {
         "size": "1776 KB",
       });
 
-      fork
-      (done)
-      (data => {
-        expect(data).to.deep.equal(expectedData);
-        done();
-      })
-      (filterFileMetadata(mockConnectionConfig)("name")(mockFileList));
+      const result = filterFileMetadata(mockConnectionConfig)("name")(mockFileList);
+      expect(result).to.deep.equal(S.Right(expectedData));
     });
 
-    it("should reject with descriptive error if file isn't present", function(done) {
+    it("should reject with descriptive error if file isn't present", function() {
       const mockConnectionConfig = {
         "host": "",
         "port": 1,
@@ -129,34 +125,50 @@ describe("Unit Tests - UtilityFunctions", function() {
 
       const expectedError = "file hello.txt not found on remote in directory /";
 
+      const result = filterFileMetadata(mockConnectionConfig)("name")(mockFileList);
+      expect(result).to.deep.equal(S.Left(expectedError));
+    });
+  });
+
+  describe("rejectOnLeft", function() {
+    it("should reject with left contents if the Either is left", function(done) {
+      const mockError = "Something went wrong! Oh no!";
+
       fork
       (err => {
-        expect(err).to.deep.equal(expectedError);
+        expect(err).to.deep.equal(mockError);
         done();
       })
       (done)
-      (filterFileMetadata(mockConnectionConfig)("name")(mockFileList));
+      (rejectOnLeft(S.Left(mockError)));
+    });
+
+    it("should return the right contents if the Either is right", function(done) {
+      const mockData = "file sent successfully";
+
+      fork
+      (done)
+      (err => {
+        expect(err).to.deep.equal(mockData);
+        done();
+      })
+      (rejectOnLeft(S.Right(mockData)));
     });
   });
 
   describe("validateConnectionConfig", function() {
-    it("should resolve with the config if all values are valid", function(done) {
+    it("should resolve with the config if all values are valid", function() {
       const config = {
         "host": "some-site",
         "port": 2,
         "remoteFileName": "some-path",
       };
 
-      fork
-      (done)
-      (data => {
-        expect(data).to.deep.equal(config);
-        done();
-      })
-      (validateConnectionConfig(config));
+      const result = validateConnectionConfig(config);
+      expect(result).to.deep.equal(S.Right(config));
     });
 
-    it("should reject if host is missing", function(done) {
+    it("should reject if host is missing", function() {
       const config = {
         "port": 2,
         "remoteFileName": "some_path.xml",
@@ -164,16 +176,11 @@ describe("Unit Tests - UtilityFunctions", function() {
 
       const expectedError = ["host is missing or invalid"];
 
-      fork
-      (err => {
-        expect(err).to.deep.equal(expectedError);
-        done();
-      })
-      (done)
-      (validateConnectionConfig(config));
+      const result = validateConnectionConfig(config);
+      expect(result).to.deep.equal(S.Left(expectedError));
     });
 
-    it("should reject if host is null", function(done) {
+    it("should reject if host is null", function() {
       const config = {
         "host": "",
         "port": 2,
@@ -182,16 +189,11 @@ describe("Unit Tests - UtilityFunctions", function() {
 
       const expectedError = ["host is missing or invalid"];
 
-      fork
-      (err => {
-        expect(err).to.deep.equal(expectedError);
-        done();
-      })
-      (done)
-      (validateConnectionConfig(config));
+      const result = validateConnectionConfig(config);
+      expect(result).to.deep.equal(S.Left(expectedError));
     });
 
-    it("should reject if host is not a string", function(done) {
+    it("should reject if host is not a string", function() {
       const config = {
         "host": 13,
         "port": 2,
@@ -200,16 +202,11 @@ describe("Unit Tests - UtilityFunctions", function() {
 
       const expectedError = ["host is missing or invalid"];
 
-      fork
-      (err => {
-        expect(err).to.deep.equal(expectedError);
-        done();
-      })
-      (done)
-      (validateConnectionConfig(config));
+      const result = validateConnectionConfig(config);
+      expect(result).to.deep.equal(S.Left(expectedError));
     });
 
-    it("should reject if port is missing", function(done) {
+    it("should reject if port is missing", function() {
       const config = {
         "host": "some-site",
         "remoteFileName": "some_path.xml",
@@ -217,16 +214,11 @@ describe("Unit Tests - UtilityFunctions", function() {
 
       const expectedError = ["port is missing or invalid"];
 
-      fork
-      (err => {
-        expect(err).to.deep.equal(expectedError);
-        done();
-      })
-      (done)
-      (validateConnectionConfig(config));
+      const result = validateConnectionConfig(config);
+      expect(result).to.deep.equal(S.Left(expectedError));
     });
 
-    it("should reject if port is null", function(done) {
+    it("should reject if port is null", function() {
       const config = {
         "host": "some-site",
         "port": null,
@@ -235,16 +227,11 @@ describe("Unit Tests - UtilityFunctions", function() {
 
       const expectedError = ["port is missing or invalid"];
 
-      fork
-      (err => {
-        expect(err).to.deep.equal(expectedError);
-        done();
-      })
-      (done)
-      (validateConnectionConfig(config));
+      const result = validateConnectionConfig(config);
+      expect(result).to.deep.equal(S.Left(expectedError));
     });
 
-    it("should reject if port is not an integer", function(done) {
+    it("should reject if port is not an integer", function() {
       const config = {
         "host": "some-site",
         "port": "portt",
@@ -253,16 +240,11 @@ describe("Unit Tests - UtilityFunctions", function() {
 
       const expectedError = ["port is missing or invalid"];
 
-      fork
-      (err => {
-        expect(err).to.deep.equal(expectedError);
-        done();
-      })
-      (done)
-      (validateConnectionConfig(config));
+      const result = validateConnectionConfig(config);
+      expect(result).to.deep.equal(S.Left(expectedError));
     });
 
-    it("should reject if port is not positive", function(done) {
+    it("should reject if port is not positive", function() {
       const config = {
         "host": "some-site",
         "port": -3,
@@ -271,16 +253,11 @@ describe("Unit Tests - UtilityFunctions", function() {
 
       const expectedError = ["port is missing or invalid"];
 
-      fork
-      (err => {
-        expect(err).to.deep.equal(expectedError);
-        done();
-      })
-      (done)
-      (validateConnectionConfig(config));
+      const result = validateConnectionConfig(config);
+      expect(result).to.deep.equal(S.Left(expectedError));
     });
 
-    it("should reject if remoteFileName is missing", function(done) {
+    it("should reject if remoteFileName is missing", function() {
       const config = {
         "host": "some-site",
         "port": 2,
@@ -288,16 +265,11 @@ describe("Unit Tests - UtilityFunctions", function() {
 
       const expectedError = ["remoteFileName is missing or invalid"];
 
-      fork
-      (err => {
-        expect(err).to.deep.equal(expectedError);
-        done();
-      })
-      (done)
-      (validateConnectionConfig(config));
+      const result = validateConnectionConfig(config);
+      expect(result).to.deep.equal(S.Left(expectedError));
     });
 
-    it("should reject if remoteFileName is null", function(done) {
+    it("should reject if remoteFileName is null", function() {
       const config = {
         "host": "some-site",
         "port": 2,
@@ -306,16 +278,11 @@ describe("Unit Tests - UtilityFunctions", function() {
 
       const expectedError = ["remoteFileName is missing or invalid"];
 
-      fork
-      (err => {
-        expect(err).to.deep.equal(expectedError);
-        done();
-      })
-      (done)
-      (validateConnectionConfig(config));
+      const result = validateConnectionConfig(config);
+      expect(result).to.deep.equal(S.Left(expectedError));
     });
 
-    it("should reject if remoteFileName is not a string", function(done) {
+    it("should reject if remoteFileName is not a string", function() {
       const config = {
         "host": "some-site",
         "port": 2,
@@ -324,18 +291,13 @@ describe("Unit Tests - UtilityFunctions", function() {
 
       const expectedError = ["remoteFileName is missing or invalid"];
 
-      fork
-      (err => {
-        expect(err).to.deep.equal(expectedError);
-        done();
-      })
-      (done)
-      (validateConnectionConfig(config));
+      const result = validateConnectionConfig(config);
+      expect(result).to.deep.equal(S.Left(expectedError));
     });
   });
 
   describe("verifyFileSignature", function() {
-    it("should put a signature on the connection config if one is not present", function(done) {
+    it("should put a signature on the connection config if one is not present", function() {
       const mockConnectionConfig = {
         "host": "",
         "port": 1,
@@ -350,7 +312,7 @@ describe("Unit Tests - UtilityFunctions", function() {
         "size": "1776 MB",
       });
 
-      const expectedResult = {
+      const expectedResult = S.Right({
         "host": "",
         "port": 1,
         "remoteFileName": "",
@@ -358,18 +320,13 @@ describe("Unit Tests - UtilityFunctions", function() {
         "user": "",
         "password": "",
         "fileSignature": "ff041f15a778695c5bae0d39c862b135",
-      };
+      });
 
-      fork
-      (done)
-      (data => {
-        expect(data).to.deep.equal(expectedResult);
-        done();
-      })
-      (verifyFileSignature(mockConnectionConfig)(mockFileMetadata));
+      const result = verifyFileSignature(mockConnectionConfig)(mockFileMetadata);
+      expect(result).to.deep.equal(expectedResult);
     });
 
-    it("should resolve with the connection config if signatures match", function(done) {
+    it("should resolve with the connection config if signatures match", function() {
       const mockConnectionConfig = {
         "host": "",
         "port": 1,
@@ -385,7 +342,7 @@ describe("Unit Tests - UtilityFunctions", function() {
         "size": "1776 MB",
       });
 
-      const expectedResult = {
+      const expectedResult = S.Right({
         "host": "",
         "port": 1,
         "remoteFileName": "",
@@ -393,18 +350,13 @@ describe("Unit Tests - UtilityFunctions", function() {
         "user": "",
         "password": "",
         "fileSignature": "ff041f15a778695c5bae0d39c862b135",
-      };
+      });
 
-      fork
-      (done)
-      (data => {
-        expect(data).to.deep.equal(expectedResult);
-        done();
-      })
-      (verifyFileSignature(mockConnectionConfig)(mockFileMetadata));
+      const result = verifyFileSignature(mockConnectionConfig)(mockFileMetadata);
+      expect(result).to.deep.equal(expectedResult);
     });
 
-    it("should reject with an error if signatures don't match", function(done) {
+    it("should reject with an error if signatures don't match", function() {
       const mockConnectionConfig = {
         "host": "",
         "port": 1,
@@ -420,15 +372,10 @@ describe("Unit Tests - UtilityFunctions", function() {
         "size": "1776 MB",
       });
 
-      const expectedResult = "File metadata changed while attempting GET. File is not currently viable for consumption";
+      const expectedResult = S.Left("File metadata changed while attempting GET. File is not currently viable for consumption");
 
-      fork
-      (err => {
-        expect(err).to.deep.equal(expectedResult);
-        done();
-      })
-      (done)
-      (verifyFileSignature(mockConnectionConfig)(mockFileMetadata));
+      const result = verifyFileSignature(mockConnectionConfig)(mockFileMetadata);
+      expect(result).to.deep.equal(expectedResult);
     });
   });
 });

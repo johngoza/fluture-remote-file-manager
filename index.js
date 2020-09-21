@@ -6,7 +6,7 @@ const R = require("ramda");
 const SftpClient = require("ssh2").Client;
 const {chain, reject} = require("fluture");
 const {createReadStream, validateConnectionConfig} = require("./lib/utility-functions.js");
-const {def, ConnectionConfig, ReadStreamType} = require("./lib/sanctuary-environment.js");
+const {def, ConnectionConfig, ReadStreamType, S} = require("./lib/sanctuary-environment.js");
 const {FutureType} = require("fluture-sanctuary-types");
 const {sendFileViaEmail} = require("./lib/email");
 const {verifyAndGetFileViaFtp, sendFileViaFtp} = require("./lib/ftp");
@@ -61,9 +61,12 @@ const forwardToGetMethod = def("forwardToGetMethod")
 
 const getFile = def("getFile")
 ({})
-([$.String, ConnectionConfig, FutureType($.String)($.Any)])
+([$.String, ConnectionConfig, FutureType($.Any)($.Any)])
 (getMethod => connectionConfig => {
-  return chain (forwardToGetMethod(getMethod) (getFunctions)) (validateConnectionConfig(connectionConfig));
+  const validationResult = validateConnectionConfig(connectionConfig);
+  return S.isLeft(validationResult)
+    ? reject(S.either(R.identity)(R.identity)(validationResult))
+    : chain (forwardToGetMethod(getMethod) (getFunctions)) (validationResult);
 });
 
 const forwardToSendMethod = def("forwardToSendMethod")
@@ -91,9 +94,12 @@ const injectFileReadStream = def("injectFileReadStream")
 
 const sendFile = def("sendFile")
 ({})
-([$.String, ConnectionConfig, $.String, FutureType($.String)($.String)])
+([$.String, ConnectionConfig, $.String, FutureType($.Any)($.String)])
 (sendMethod => connectionConfig => fileName => {
-  return chain (injectFileReadStream(sendMethod)(fileName)) (validateConnectionConfig(connectionConfig));
+  const validationResult = validateConnectionConfig(connectionConfig);
+  return S.isLeft(validationResult)
+    ? reject(S.either(R.identity)(R.identity)(validationResult))
+    : chain (injectFileReadStream(sendMethod)(fileName)) (validationResult);
 });
 
 module.exports = {

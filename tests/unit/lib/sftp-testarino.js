@@ -38,3 +38,13 @@
 // });
 //
 // client.connect(connectionConfig);
+
+// const S = require("sanctuary");
+// const {fork, chain, reject, resolve} = require("fluture");
+//
+// const example = chain(S.either(reject)(resolve))(resolve(S.Right(42)));
+//
+// fork
+// (console.log)
+// (console.log)
+// (example);

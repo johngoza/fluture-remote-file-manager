@@ -552,32 +552,43 @@ describe("Unit Tests - sftp.js", function() {
       readable.push(null);
     });
 
-    it("should reject if the client encounters and error elsewhere", function(done) {
+    it("should reject if the client encounters an error elsewhere", function(done) {
       const mockConnectionConfig = {
         "host": "",
         "port": 1,
         "remoteFileName": "hello.txt",
-        "remoteDirectory": "",
+        "remoteDirectory": "/",
         "user": "",
         "password": "",
       };
 
-      const mockError = {
-        "message": "an error occurred",
-        "code": "500",
+      const mockFileList = [
+        {
+          "filename": "not-hello.txt",
+          "size": "0 MB",
+        },
+      ];
+
+      const sftp = {
+        "readdir": (remoteDirectory, cb) => {
+          cb(null, mockFileList);
+        },
       };
 
       const mockSftpClient = new EventEmitter();
 
-      mockSftpClient.sftp = (cb) => { };
-      mockSftpClient.connect = () => {
-        mockSftpClient.emit("error", mockError);
+      mockSftpClient.sftp = (cb) => {
+        cb(null, sftp);
       };
+      mockSftpClient.connect = () => {
+        mockSftpClient.emit("ready");
+      };
+
       mockSftpClient.end = () => {};
 
       fork
       (err => {
-        expect(err).to.deep.equal(mockError);
+        expect(err).to.deep.equal("file hello.txt not found on remote in directory /");
         done();
       })
       (done)

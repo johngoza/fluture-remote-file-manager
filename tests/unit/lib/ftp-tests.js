@@ -5,6 +5,7 @@ const {
   sendFileViaFtp,
   setupConnection,
   verifyAndGetFileViaFtp,
+  verifyFile,
 } = require("../../../lib/ftp");
 const {expect} = require("chai");
 const {Future, fork} = require("fluture");
@@ -111,35 +112,36 @@ describe("Unit Tests - ftp.js", function() {
       (getFileViaFtp(mockFtpClient)(mockConnectionConfig));
     });
 
-    it("should reject if the client throws an error during get", function(done) {
-      const mockConnectionConfig = {
-        "host": "",
-        "port": 1,
-        "remoteFileName": "",
-        "remoteDirectory": "",
-        "user": "",
-        "password": "",
-      };
-
-      const mockFtpClient = new EventEmitter();
-      mockFtpClient.connect = (config) => {
-        mockFtpClient.emit("ready");
-      };
-      mockFtpClient.put = () => { };
-      mockFtpClient.get = (p, cb) => {
-        mockFtpClient.emit("error", {"code": "503", "message": "get failed"});
-      };
-      mockFtpClient.list = () => { };
-      mockFtpClient.end = () => { };
-
-      fork
-      (err => {
-        expect(err).to.equal("503 get failed");
-        done();
-      })
-      (done)
-      (getFileViaFtp(mockFtpClient)(mockConnectionConfig));
-    });
+    // todo: nuke this
+    // it("should reject if the client throws an error during get", function(done) {
+    //   const mockConnectionConfig = {
+    //     "host": "",
+    //     "port": 1,
+    //     "remoteFileName": "",
+    //     "remoteDirectory": "",
+    //     "user": "",
+    //     "password": "",
+    //   };
+    //
+    //   const mockFtpClient = new EventEmitter();
+    //   mockFtpClient.connect = (config) => {
+    //     mockFtpClient.emit("ready");
+    //   };
+    //   mockFtpClient.put = () => { };
+    //   mockFtpClient.get = (p, cb) => {
+    //     mockFtpClient.emit("error", {"code": "503", "message": "get failed"});
+    //   };
+    //   mockFtpClient.list = () => { };
+    //   mockFtpClient.end = () => { };
+    //
+    //   fork
+    //   (err => {
+    //     expect(err).to.equal("503 get failed");
+    //     done();
+    //   })
+    //   (done)
+    //   (getFileViaFtp(mockFtpClient)(mockConnectionConfig));
+    // });
   });
 
   describe("getFileMetadata", function() {
@@ -403,7 +405,7 @@ describe("Unit Tests - ftp.js", function() {
     });
   });
 
-  describe("verifyAndGetFile", function() {
+  describe("verifyAndGetFileViaFtp", function() {
     it("should resolve with a readstream", function(done) {
       const mockConnectionConfig = {
         "host": "",
@@ -503,8 +505,10 @@ describe("Unit Tests - ftp.js", function() {
       (done)
       (verifyAndGetFileViaFtp(mockFtpClient)(mockConnectionConfig));
     });
+  });
 
-    it("should reject if an error is encountered elsewhere", function(done) {
+  describe("verifyFile", function() {
+    it("should resolve with the connectionConfig", function(done) {
       const mockConnectionConfig = {
         "host": "",
         "port": 1,
@@ -514,33 +518,83 @@ describe("Unit Tests - ftp.js", function() {
         "password": "",
       };
 
-      const mockError = {
-        "message": "an error occurred",
-        "code": "500",
-      };
-
-      const readable = new Readable();
+      const mockFileList = [
+        {
+          "name": "hello.txt",
+          "size": "2 KB",
+        },
+        {
+          "name": "other-file.txt",
+          "size": "3 MB",
+        },
+      ];
 
       const mockFtpClient = new EventEmitter();
       mockFtpClient.connect = (config) => {
         mockFtpClient.emit("ready");
       };
       mockFtpClient.put = () => { };
-      mockFtpClient.get = (path, callback) => {
-        callback(null, readable);
-      };
+      mockFtpClient.get = () => { };
       mockFtpClient.list = (remoteDirectory, cb) => {
-        mockFtpClient.emit("error", mockError);
+        cb(null, mockFileList);
       };
       mockFtpClient.end = () => { };
 
       fork
+      (done)
+      (data => {
+        expect(data).to.deep.equal(mockConnectionConfig);
+        done();
+      })
+      (verifyFile(mockFtpClient)(0)(2)(mockConnectionConfig)(""));
+    });
+
+    it("should reject if the file signature changes", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFileName": "hello.txt",
+        "remoteDirectory": "",
+        "user": "",
+        "password": "",
+      };
+
+      const mockFileList1 = [
+        {
+          "name": "hello.txt",
+          "size": "2 KB",
+        },
+      ];
+
+      const mockFileList2 = [
+        {
+          "name": "hello.txt",
+          "size": "20 KB",
+        },
+      ];
+
+      let accessCount = 0;
+      const mockFtpClient = new EventEmitter();
+      mockFtpClient.connect = (config) => {
+        mockFtpClient.emit("ready");
+      };
+      mockFtpClient.put = () => { };
+      mockFtpClient.get = () => { };
+      mockFtpClient.list = (remoteDirectory, cb) => {
+        accessCount > 0 ? cb(null, mockFileList1) : cb(null, mockFileList2);
+        accessCount = accessCount + 1;
+      };
+      mockFtpClient.end = () => { };
+
+      const expectedError = "File metadata changed while attempting GET. File is not currently viable for consumption";
+
+      fork
       (err => {
-        expect(err).to.deep.equal("500 an error occurred");
+        expect(err).to.deep.equal(expectedError);
         done();
       })
       (done)
-      (verifyAndGetFileViaFtp(mockFtpClient)(mockConnectionConfig));
+      (verifyFile(mockFtpClient)(0)(2)(mockConnectionConfig)(""));
     });
   });
 });

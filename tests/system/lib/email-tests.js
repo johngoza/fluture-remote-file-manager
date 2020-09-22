@@ -1,7 +1,7 @@
 const expect = require("chai").expect;
 const path = require("path");
 const {fork} = require("fluture");
-const {sendFile} = require(path.join(__dirname, "../../../index.js"));
+const {sendFile} = require(path.join(__dirname, "../../../index"));
 
 // The expect wrapped in a try/catch is bad practice
 // but is unfortunately required as smtpserver changes the context

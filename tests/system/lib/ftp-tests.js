@@ -3,7 +3,7 @@ const expect = chai.expect;
 const Ftp = require("ftp");
 const path = require("path");
 const {fork} = require("fluture");
-const {getFile, sendFile} = require(path.join(__dirname, "../../../index.js"));
+const {getFile, sendFile} = require(path.join(__dirname, "../../../index"));
 
 describe("SYSTEM TESTS - ftp.js", function() {
   describe("getFileViaFtp", function() {
@@ -173,6 +173,8 @@ describe("SYSTEM TESTS - ftp.js", function() {
     //   (getFile("ftp")(connectionConfig));
     // });
 
+    // todo: fix this
+    // Error: done() invoked with non-Error: ERR_SSL_WRONG_VERSION_NUMBER 139663953001800:error:1408F10B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:308:
     it("should put a file on an ftps server", function(done) {
       this.timeout(5000);
 

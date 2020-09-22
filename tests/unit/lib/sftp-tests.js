@@ -1,7 +1,13 @@
 const EventEmitter = require("events");
+const {
+  getFileViaSftp,
+  getFileMetadata,
+  sendFileViaSftp,
+  verifyAndGetFileViaSftp,
+  verifyFile,
+} = require("../../../lib/sftp");
 const {expect} = require("chai");
 const {fork} = require("fluture");
-const {getFileViaSftp, getFileMetadata, sendFileViaSftp, verifyAndGetFileViaSftp} = require("../../../lib/sftp");
 const {Readable, PassThrough} = require("stream");
 
 describe("Unit Tests - sftp.js", function() {
@@ -133,38 +139,6 @@ describe("Unit Tests - sftp.js", function() {
       (done)
       (getFileViaSftp(mockSftpClient)(mockConnectionConfig));
     });
-
-    it("should reject if there is an error emitted by the client", function(done) {
-      const mockConnectionConfig = {
-        "host": "",
-        "port": 1,
-        "remoteFileName": "some_file.txt",
-        "remoteDirectory": "",
-        "user": "",
-        "password": "",
-      };
-
-      const mockSftpClient = new EventEmitter();
-      const mockError = "Error constructing SFTP";
-
-      mockSftpClient.sftp = (cb) => {
-        mockSftpClient.emit("error", mockError);
-      };
-      mockSftpClient.connect = () => {
-        mockSftpClient.emit("ready");
-      };
-      mockSftpClient.end = () => {};
-
-      const verifyResult = err => {
-        expect(err).to.equal(mockError);
-        done();
-      };
-
-      fork
-      (verifyResult)
-      (done)
-      (getFileViaSftp(mockSftpClient)(mockConnectionConfig));
-    });
   });
 
   describe("getFileMetadata", function() {
@@ -269,37 +243,6 @@ describe("Unit Tests - sftp.js", function() {
       fork
       (err => {
         expect(err).to.deep.equal("400 Directory not found");
-        done();
-      })
-      (done)
-      (getFileMetadata(mockConnectionConfig)(mockSftpClient));
-    });
-
-    it("should reject with an error if one is emitted", function(done) {
-      const mockConnectionConfig = {
-        "host": "",
-        "port": 1,
-        "remoteFileName": "hello.txt",
-        "remoteDirectory": "",
-        "user": "",
-        "password": "",
-      };
-
-      const mockError = {
-        "code": "400",
-        "message": "Directory not found",
-      };
-
-      const mockSftpClient = new EventEmitter();
-      mockSftpClient.sftp = (cb) => {
-        mockSftpClient.emit("error", mockError);
-      };
-      mockSftpClient.connect = () => { };
-      mockSftpClient.end = () => { };
-
-      fork
-      (err => {
-        expect(err).to.deep.equal(mockError);
         done();
       })
       (done)
@@ -435,7 +378,7 @@ describe("Unit Tests - sftp.js", function() {
     });
   });
 
-  describe("verifyAndGetFile", function() {
+  describe("verifyAndGetFileViaSftp", function() {
     it("should resolve with a readstream", function(done) {
       const mockConnectionConfig = {
         "host": "",
@@ -551,23 +494,27 @@ describe("Unit Tests - sftp.js", function() {
       readable.emit("error", mockError);
       readable.push(null);
     });
+  });
 
-    it("should reject if the client encounters an error elsewhere", function(done) {
+  describe("verifyFile", function() {
+    it("should resolve with the connectionConfig", function(done) {
       const mockConnectionConfig = {
         "host": "",
         "port": 1,
         "remoteFileName": "hello.txt",
-        "remoteDirectory": "/",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
 
       const mockFileList = [
         {
-          "filename": "not-hello.txt",
+          "filename": "hello.txt",
           "size": "0 MB",
         },
       ];
+
+      const mockSftpClient = new EventEmitter();
 
       const sftp = {
         "readdir": (remoteDirectory, cb) => {
@@ -575,7 +522,57 @@ describe("Unit Tests - sftp.js", function() {
         },
       };
 
+      mockSftpClient.sftp = (cb) => {
+        cb(null, sftp);
+      };
+      mockSftpClient.connect = () => {
+        mockSftpClient.emit("ready");
+      };
+      mockSftpClient.on("ready", () => {});
+      mockSftpClient.end = () => {};
+
+      fork
+      (done)
+      (data => {
+        expect(data).to.deep.equal(mockConnectionConfig);
+        done();
+      })
+      (verifyFile(mockSftpClient)(0)(2)(mockConnectionConfig)(""));
+    });
+
+    it("should reject if the file signature changes", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFileName": "hello.txt",
+        "remoteDirectory": "",
+        "user": "",
+        "password": "",
+      };
+
+      const mockFileList1 = [
+        {
+          "filename": "hello.txt",
+          "size": "0 MB",
+        },
+      ];
+
+      const mockFileList2 = [
+        {
+          "filename": "hello.txt",
+          "size": "10 MB",
+        },
+      ];
+
       const mockSftpClient = new EventEmitter();
+
+      let accessCount = 0;
+      const sftp = {
+        "readdir": (remoteDirectory, cb) => {
+          accessCount > 0 ? cb(null, mockFileList1) : cb(null, mockFileList2);
+          accessCount = accessCount + 1;
+        },
+      };
 
       mockSftpClient.sftp = (cb) => {
         cb(null, sftp);
@@ -583,16 +580,63 @@ describe("Unit Tests - sftp.js", function() {
       mockSftpClient.connect = () => {
         mockSftpClient.emit("ready");
       };
-
+      mockSftpClient.on("ready", () => {});
       mockSftpClient.end = () => {};
+
+      const expectedError = "File metadata changed while attempting GET. File is not currently viable for consumption";
 
       fork
       (err => {
-        expect(err).to.deep.equal("file hello.txt not found on remote in directory /");
+        expect(err).to.deep.equal(expectedError);
         done();
       })
       (done)
-      (verifyAndGetFileViaSftp(mockSftpClient)(mockConnectionConfig));
+      (verifyFile(mockSftpClient)(0)(2)(mockConnectionConfig)(""));
+    });
+
+    it("should recur the correct number of times", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFileName": "hello.txt",
+        "remoteDirectory": "",
+        "user": "",
+        "password": "",
+      };
+
+      const mockFileList = [
+        {
+          "filename": "hello.txt",
+          "size": "0 MB",
+        },
+      ];
+
+      const mockSftpClient = new EventEmitter();
+
+      let accessCount = 0;
+      const sftp = {
+        "readdir": (remoteDirectory, cb) => {
+          cb(null, mockFileList);
+          accessCount = accessCount + 1;
+        },
+      };
+
+      mockSftpClient.sftp = (cb) => {
+        cb(null, sftp);
+      };
+      mockSftpClient.connect = () => {
+        mockSftpClient.emit("ready");
+      };
+      mockSftpClient.on("ready", () => {});
+      mockSftpClient.end = () => {};
+
+      fork
+      (done)
+      (data => {
+        expect(accessCount).to.equal(2);
+        done();
+      })
+      (verifyFile(mockSftpClient)(0)(2)(mockConnectionConfig)(""));
     });
   });
 });

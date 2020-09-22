@@ -297,75 +297,32 @@ describe("Unit Tests - UtilityFunctions", function() {
   });
 
   describe("verifyFileSignature", function() {
-    it("should put a signature on the connection config if one is not present", function() {
-      const mockConnectionConfig = {
-        "host": "",
-        "port": 1,
-        "remoteFileName": "",
-        "remoteDirectory": "",
-        "user": "",
-        "password": "",
-      };
-
+    it("should return a signature if one is not provided", function() {
       const mockFileMetadata = S.Just({
         "name": "hello.txt",
         "size": "1776 MB",
       });
 
-      const expectedResult = S.Right({
-        "host": "",
-        "port": 1,
-        "remoteFileName": "",
-        "remoteDirectory": "",
-        "user": "",
-        "password": "",
-        "fileSignature": "ff041f15a778695c5bae0d39c862b135",
-      });
+      const expectedResult = S.Right("ff041f15a778695c5bae0d39c862b135");
 
-      const result = verifyFileSignature(mockConnectionConfig)(mockFileMetadata);
+      const result = verifyFileSignature("")(mockFileMetadata);
       expect(result).to.deep.equal(expectedResult);
     });
 
-    it("should resolve with the connection config if signatures match", function() {
-      const mockConnectionConfig = {
-        "host": "",
-        "port": 1,
-        "remoteFileName": "",
-        "remoteDirectory": "",
-        "user": "",
-        "password": "",
-        "fileSignature": "ff041f15a778695c5bae0d39c862b135",
-      };
+    it("should resolve with the signature if the recomputed signature matches", function() {
+      const mockSignature = "ff041f15a778695c5bae0d39c862b135";
 
       const mockFileMetadata = S.Just({
         "name": "hello.txt",
         "size": "1776 MB",
       });
 
-      const expectedResult = S.Right({
-        "host": "",
-        "port": 1,
-        "remoteFileName": "",
-        "remoteDirectory": "",
-        "user": "",
-        "password": "",
-        "fileSignature": "ff041f15a778695c5bae0d39c862b135",
-      });
-
-      const result = verifyFileSignature(mockConnectionConfig)(mockFileMetadata);
-      expect(result).to.deep.equal(expectedResult);
+      const result = verifyFileSignature(mockSignature)(mockFileMetadata);
+      expect(result).to.deep.equal(S.Right(mockSignature));
     });
 
     it("should reject with an error if signatures don't match", function() {
-      const mockConnectionConfig = {
-        "host": "",
-        "port": 1,
-        "remoteFileName": "",
-        "remoteDirectory": "",
-        "user": "",
-        "password": "",
-        "fileSignature": "not-a-real-signature",
-      };
+      const mockSignature = "not-a-real-signature";
 
       const mockFileMetadata = S.Just({
         "name": "hello.txt",
@@ -374,7 +331,7 @@ describe("Unit Tests - UtilityFunctions", function() {
 
       const expectedResult = S.Left("File metadata changed while attempting GET. File is not currently viable for consumption");
 
-      const result = verifyFileSignature(mockConnectionConfig)(mockFileMetadata);
+      const result = verifyFileSignature(mockSignature)(mockFileMetadata);
       expect(result).to.deep.equal(expectedResult);
     });
   });

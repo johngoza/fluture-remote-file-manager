@@ -138,7 +138,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
     });
   });
 
-  describe("sendFileViaFtps", function() {
+  describe("getFileViaFtps", function() {
     it("should get a file on an ftps server", function(done) {
       this.timeout(5000);
 
@@ -175,6 +175,32 @@ describe("SYSTEM TESTS - ftp.js", function() {
       (getFile("ftp")(connectionConfig));
     });
 
+    it("should reject if the ftps server throws an error", function(done) {
+      this.timeout(5000);
+
+      // no password will fail every time
+      const connectionConfig = {
+        "host": "ftps-server",
+        "port": 21,
+        "remoteDirectory": "/user/",
+        "remoteFileName": "some_file.txt",
+        "user": "user",
+        "password": "",
+        "secure": true,
+        "secureOptions": {"rejectUnauthorized": false},
+      };
+
+      fork
+      (err => {
+        expect(err).to.deep.equal("530 Login incorrect.");
+        done();
+      })
+      (done)
+      (getFile("ftp")(connectionConfig));
+    });
+  });
+
+  describe("sendFileViaFtps", function() {
     it("should put a file on an ftps server", function(done) {
       this.timeout(5000);
 

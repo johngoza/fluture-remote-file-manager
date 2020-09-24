@@ -1,27 +1,27 @@
 version: "3.3"
 services:
-  email-server:
-    build: ./resources/email/
-    logging:
-      driver: none
-  ftp-server:
-    build: ./resources/ftp/
+#  email-server:
+#    build: ./resources/email/
+#    logging:
+#      driver: none
+#  ftp-server:
+#    build: ./resources/ftp/
 #    logging:
 #      driver: none
   ftps-server:
     build: ./resources/ftps/
     logging:
       driver: none
-  sftp-server:
-    build: ./resources/sftp/
-    logging:
-      driver: none
+#  sftp-server:
+#    build: ./resources/sftp/
+#    logging:
+#      driver: none
   test-server:
     build:
       context: ../../
       dockerfile: ./tests/system/Dockerfile
     depends_on:
-      - email-server
-      - ftp-server
+#      - email-server
+#      - ftp-server
       - ftps-server
-      - sftp-server
+#      - sftp-server

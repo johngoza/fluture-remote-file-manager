@@ -11,7 +11,7 @@
     "test": "NODE_ENV='development' mocha --recursive tests/integration tests/unit",
     "silent-test": "NODE_ENV='development' mocha --recursive tests/integration tests/unit > /dev/null",
     "system-test": "./tests/system/system-test.sh",
-    "system-test-suite": "NODE_ENV='development' mocha --recursive tests/system",
+    "system-test-suite": "NODE_ENV='development' mocha --recursive tests/system/lib/ftp-tests.js -g 'should reject if the ftps server throws an error'",
     "lint": "eslint ./",
     "coverage": "nyc npm run silent-test"
   },

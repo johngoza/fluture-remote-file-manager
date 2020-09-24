@@ -5,8 +5,16 @@ const path = require("path");
 const {fork} = require("fluture");
 const {getFile, sendFile} = require(path.join(__dirname, "../../../index"));
 
-// if you see something like ERR_SSL_WRONG_VERSION_NUMBER it's probably not an auth/ssl issue
-// chances are excellent you have a test that's not closing its connection
+// There is a known limitation for vsftpd (ftps); it cannot currently support handle TLSv1.3 (as of 23 SEPT 2020)
+// see https://forum.filezilla-project.org/viewtopic.php?t=50598 for more
+// if you see something like ERR_SSL_WRONG_VERSION_NUMBER you have modified the TLS settings and will need to revert them
+// For the FTPS connection configs, the secureOptions MUST be
+//         "secureOptions": {
+//           "rejectUnauthorized": false,
+//           "minVersion": "TLSv1.2",
+//           "maxVersion": "TLSv1.2",
+//         },
+// anything less explicit than that tests either deprecated methods (TLSv1.1) or unsupported (TLSv1.3)
 describe("SYSTEM TESTS - ftp.js", function() {
   describe("getFileViaFtp", function() {
     it("should get a file on an ftp server", function(done) {
@@ -138,6 +146,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
     });
   });
 
+  // do not modify the secureOptions field for any of the below connection configs. Read note at head of file for more.
   describe("getFileViaFtps", function() {
     it("should get a file on an ftps server", function(done) {
       this.timeout(5000);
@@ -153,7 +162,8 @@ describe("SYSTEM TESTS - ftp.js", function() {
         "secure": true,
         "secureOptions": {
           "rejectUnauthorized": false,
-          "secureProtocol": "TLSv1_method",
+          "minVersion": "TLSv1.2",
+          "maxVersion": "TLSv1.2",
         },
       };
 
@@ -187,7 +197,11 @@ describe("SYSTEM TESTS - ftp.js", function() {
         "user": "user",
         "password": "",
         "secure": true,
-        "secureOptions": {"rejectUnauthorized": false},
+        "secureOptions": {
+          "rejectUnauthorized": false,
+          "minVersion": "TLSv1.2",
+          "maxVersion": "TLSv1.2",
+        },
       };
 
       fork
@@ -214,7 +228,8 @@ describe("SYSTEM TESTS - ftp.js", function() {
         "secure": true,
         "secureOptions": {
           "rejectUnauthorized": false,
-          "secureProtocol": "TLSv1_method",
+          "minVersion": "TLSv1.2",
+          "maxVersion": "TLSv1.2",
         },
       };
 
@@ -279,7 +294,11 @@ describe("SYSTEM TESTS - ftp.js", function() {
         "user": "user",
         "password": "",
         "secure": true,
-        "secureOptions": {"rejectUnauthorized": false},
+        "secureOptions": {
+          "rejectUnauthorized": false,
+          "minVersion": "TLSv1.2",
+          "maxVersion": "TLSv1.2",
+        },
       };
 
       const filepath = "tests/system/resources/hello.txt";

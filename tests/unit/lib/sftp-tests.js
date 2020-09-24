@@ -3,6 +3,7 @@ const {
   getFileViaSftp,
   getFileMetadata,
   sendFileViaSftp,
+  setupConnection,
   verifyAndGetFileViaSftp,
   verifyFile,
 } = require("../../../lib/sftp");
@@ -375,6 +376,69 @@ describe("Unit Tests - sftp.js", function() {
       (verifyResult)
       (done)
       (sendFileViaSftp(mockSftpClient)(readable)(mockConnectionConfig));
+    });
+  });
+
+  describe("setupConnection", function() {
+    it("should resolve with the ftp client", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFileName": "",
+        "remoteDirectory": "",
+        "user": "",
+        "password": "",
+      };
+
+      const mockSftpClient = new EventEmitter();
+
+      mockSftpClient.sftp = (cb) => { };
+      mockSftpClient.connect = () => {
+        mockSftpClient.emit("ready");
+      };
+      mockSftpClient.on("ready", () => {});
+      mockSftpClient.end = () => {};
+
+      fork
+      (done)
+      (data => {
+        expect(data).to.deep.equal(mockSftpClient);
+        done();
+      })
+      (setupConnection(mockSftpClient)(mockConnectionConfig));
+    });
+
+    it("should reject if an error is thrown", function(done) {
+      const mockConnectionConfig = {
+        "host": "",
+        "port": 1,
+        "remoteFileName": "",
+        "remoteDirectory": "",
+        "user": "",
+        "password": "",
+      };
+
+      const mockError = {
+        "message": "an error occurred",
+        "code": "500",
+      };
+
+      const mockSftpClient = new EventEmitter();
+
+      mockSftpClient.sftp = (cb) => { };
+      mockSftpClient.connect = () => {
+        mockSftpClient.emit("error", mockError);
+      };
+      mockSftpClient.on("ready", () => {});
+      mockSftpClient.end = () => {};
+
+      fork
+      (err => {
+        expect(err).to.deep.equal(mockError);
+        done();
+      })
+      (done)
+      (setupConnection(mockSftpClient)(mockConnectionConfig));
     });
   });
 

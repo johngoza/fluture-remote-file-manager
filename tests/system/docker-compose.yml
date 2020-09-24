@@ -6,8 +6,8 @@ services:
       driver: none
   ftp-server:
     build: ./resources/ftp/
-    logging:
-      driver: none
+#    logging:
+#      driver: none
   ftps-server:
     build: ./resources/ftps/
     logging:

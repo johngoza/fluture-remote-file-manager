@@ -186,7 +186,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
     });
 
     it("should reject if the ftps server throws an error", function(done) {
-      this.timeout(5000);
+      this.timeout(10000);
 
       // no password will fail every time
       const connectionConfig = {

@@ -155,7 +155,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
       const connectionConfig = {
         "host": "ftps-server",
         "port": 21,
-        "remoteDirectory": "/user/",
+        "remoteDirectory": "",
         "remoteFileName": "hello.txt",
         "user": "user",
         "password": "password",
@@ -192,7 +192,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
       const connectionConfig = {
         "host": "ftps-server",
         "port": 21,
-        "remoteDirectory": "/user/",
+        "remoteDirectory": "",
         "remoteFileName": "some_file.txt",
         "user": "user",
         "password": "",
@@ -221,7 +221,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
       const connectionConfig = {
         "host": "ftps-server",
         "port": 21,
-        "remoteDirectory": "/user/",
+        "remoteDirectory": "",
         "remoteFileName": "some_file.txt",
         "user": "user",
         "password": "password",
@@ -289,7 +289,7 @@ describe("SYSTEM TESTS - ftp.js", function() {
       const connectionConfig = {
         "host": "ftps-server",
         "port": 21,
-        "remoteDirectory": "/user/",
+        "remoteDirectory": "",
         "remoteFileName": "some_file.txt",
         "user": "user",
         "password": "",

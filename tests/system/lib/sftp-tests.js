@@ -1,9 +1,11 @@
+// todo: uncomment all this once ftps tests are fixed
+
 const chai = require("chai");
 const expect = chai.expect;
 const fs = require("fs");
 const path = require("path");
 const {fork} = require("fluture");
-const {getFile, sendFile} = require(path.join(__dirname, "../../../index.js"));
+const {getFile, sendFile} = require(path.join(__dirname, "../../../index"));
 
 describe("SYSTEM TESTS - sftp.js", function() {
   describe("sendFileViaSftp", function() {
@@ -13,7 +15,8 @@ describe("SYSTEM TESTS - sftp.js", function() {
       const connectionConfig = {
         "host": "sftp-server",
         "port": 22,
-        "remoteFilePath": "some_file.txt",
+        "remoteDirectory": "/",
+        "remoteFileName": "some_file.txt",
         "user": "user",
         "privateKey": privateKey,
       };
@@ -35,7 +38,8 @@ describe("SYSTEM TESTS - sftp.js", function() {
       const connectionConfig = {
         "host": "sftp-server",
         "port": 22,
-        "remoteFilePath": "some_file.txt",
+        "remoteDirectory": "/",
+        "remoteFileName": "some_file.txt",
         "user": "user",
         "password": "password",
       };
@@ -58,7 +62,8 @@ describe("SYSTEM TESTS - sftp.js", function() {
       const connectionConfig = {
         "host": "sftp-server",
         "port": 22,
-        "remoteFilePath": "some_file.txt",
+        "remoteDirectory": "/",
+        "remoteFileName": "some_file.txt",
         "user": "",
         "password": "",
       };
@@ -80,7 +85,8 @@ describe("SYSTEM TESTS - sftp.js", function() {
       const connectionConfig = {
         "host": "sftp-server",
         "port": 22,
-        "remoteFilePath": "hello.txt",
+        "remoteDirectory": "/home/user",
+        "remoteFileName": "hello.txt",
         "user": "user",
         "password": "password",
       };
@@ -110,7 +116,8 @@ describe("SYSTEM TESTS - sftp.js", function() {
       const connectionConfig = {
         "host": "sftp-server",
         "port": 22,
-        "remoteFilePath": "hello.txt",
+        "remoteDirectory": "/home/user/",
+        "remoteFileName": "hello.txt",
         "user": "user",
         "privateKey": privateKey,
       };
@@ -139,7 +146,8 @@ describe("SYSTEM TESTS - sftp.js", function() {
       const connectionConfig = {
         "host": "sftp-server",
         "port": 22,
-        "remoteFilePath": "some_file.txt",
+        "remoteDirectory": "/",
+        "remoteFileName": "some_file.txt",
         "user": "",
         "password": "",
       };

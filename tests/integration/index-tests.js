@@ -1,19 +1,20 @@
 const EventEmitter = require("events");
 const {expect} = require("chai");
 const {fork} = require("fluture");
-const {forwardToGetMethod, forwardToSendMethod, getFile, sendFile} = require("../../index.js");
-const {getFileViaFtp, sendFileViaFtp} = require("../../lib/ftp.js");
-const {getFileViaSftp, sendFileViaSftp} = require("../../lib/sftp.js");
+const {forwardToGetMethod, forwardToSendMethod, getFile, sendFile} = require("../../index");
+const {getFileViaFtp, sendFileViaFtp} = require("../../lib/ftp");
+const {getFileViaSftp, sendFileViaSftp} = require("../../lib/sftp");
 const {Readable, PassThrough} = require("stream");
-const {sendFileViaEmail} = require("../../lib/email.js");
+const {sendFileViaEmail} = require("../../lib/email");
 
 describe("Integration Tests", function() {
   describe("forwardToGetMethod", function() {
-    it("should reject if the desired get method is not found", function(done) {
+    it("should reject if the desired get method is not defined", function(done) {
       const mockConnectionConfig = {
         "host": "hostname",
         "port": 1,
-        "remoteFilePath": "file.txt",
+        "remoteFileName": "file.txt",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -44,7 +45,8 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "hostname",
         "port": 1,
-        "remoteFilePath": "file.txt",
+        "remoteFileName": "file.txt",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -62,6 +64,7 @@ describe("Integration Tests", function() {
       mockFtpClient.get = (path, callback) => {
         callback(null, readable);
       };
+      mockFtpClient.list = () => { };
       mockFtpClient.end = () => { };
 
       const mockGetFunctions = {
@@ -96,7 +99,8 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "hostname",
         "port": 1,
-        "remoteFilePath": "file.txt",
+        "remoteFileName": "file.txt",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -105,7 +109,7 @@ describe("Integration Tests", function() {
       const mockSftpClient = new EventEmitter();
 
       const sftp = {
-        "createReadStream": (remoteFilePath) => {
+        "createReadStream": (remoteFileName) => {
           return readable;
         },
       };
@@ -155,12 +159,10 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
-        "user": "",
-        "password": "",
+        "remoteFileName": "",
       };
 
-      const expectedResult = ["host is missing or invalid", "remoteFilePath is missing or invalid"];
+      const expectedResult = ["host is missing or invalid", "remoteFileName is missing or invalid"];
 
       fork
       (err => {
@@ -175,7 +177,8 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "localhost",
         "port": 1,
-        "remoteFilePath": "file.txt",
+        "remoteFileName": "file.txt",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -194,9 +197,9 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "localhost",
         "port": 1,
-        "remoteFilePath": "file.txt",
-        "user": "",
-        "password": "",
+        "remoteFileName": "file.txt",
+        "remoteDirectory": "",
+        "user": "user",
       };
 
       fork
@@ -211,25 +214,17 @@ describe("Integration Tests", function() {
   });
 
   describe("forwardToSendMethod", function() {
-    it("should reject if the desired send method is not found", function(done) {
+    it("should reject if the desired send method is not defined", function(done) {
       const mockConnectionConfig = {
-        "host": "",
+        "host": "hostname",
         "port": 1,
-        "remoteFilePath": "file.txt",
-        "user": "",
-        "password": "",
+        "remoteFileName": "file.txt",
       };
-
-      const mockFtpClient = new EventEmitter();
-      mockFtpClient.connect = () => { };
-      mockFtpClient.put = () => { };
-      mockFtpClient.get = () => { };
-      mockFtpClient.end = () => { };
 
       const mockSendFunctions = {
         "ftp": {
           "method": getFileViaFtp,
-          "client": mockFtpClient,
+          "client": {},
         },
       };
 
@@ -244,9 +239,10 @@ describe("Integration Tests", function() {
 
     it("should route to ftp", function(done) {
       const mockConnectionConfig = {
-        "host": "",
+        "host": "hostname",
         "port": 1,
-        "remoteFilePath": "file.txt",
+        "remoteFileName": "file.txt",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -259,6 +255,7 @@ describe("Integration Tests", function() {
       mockFtpClient.put = (readable, path, callback) => {
         callback();
       };
+      mockFtpClient.list = () => { };
       mockFtpClient.end = () => { };
 
       const mockSendFunctions = {
@@ -269,7 +266,6 @@ describe("Integration Tests", function() {
       };
 
       const readable = new Readable();
-      readable.push("hello world");
       readable.push(null);
 
       fork
@@ -285,18 +281,17 @@ describe("Integration Tests", function() {
 
     it("should route to sftp", function(done) {
       const mockConnectionConfig = {
-        "host": "",
+        "host": "hostname",
         "port": 1,
-        "remoteFilePath": "file.txt",
-        "user": "",
-        "password": "",
+        "remoteFileName": "file.txt",
+        "remoteDirectory": "",
       };
 
       const passThrough = new PassThrough();
       const mockSftpClient = new EventEmitter();
 
       const sftp = {
-        "createWriteStream": (remoteFilePath) => {
+        "createWriteStream": (remoteFileName) => {
           return passThrough;
         },
       };
@@ -346,7 +341,7 @@ describe("Integration Tests", function() {
       const mockConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFileName": "",
         "auth": {
           "user": "",
           "pass": "",
@@ -379,33 +374,6 @@ describe("Integration Tests", function() {
       })
       (forwardToSendMethod ("email") (mockSendFunctions) (mockConfig) (new Readable()));
     });
-
-    it("should reject if an unsupported send method string is provided", function(done) {
-      const mockConnectionConfig = {
-        "host": "",
-        "port": 1,
-        "remoteFilePath": "file.txt",
-        "user": "",
-        "password": "",
-      };
-
-      const mockSendFunctions = {
-        "foo": {
-          "method": "method",
-          "client": "client",
-        },
-      };
-
-      fork
-      (err => {
-        expect(err).to.equal("Send function not available");
-        done();
-      })
-      (data => {
-        done("Expected an error but recieved " + data);
-      })
-      (forwardToSendMethod ("bar") (mockSendFunctions) (mockConnectionConfig) (new Readable()));
-    });
   });
 
   describe("sendFile", function() {
@@ -413,12 +381,10 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
-        "user": "",
-        "password": "",
+        "remoteFileName": "",
       };
 
-      const expectedResult = ["host is missing or invalid", "remoteFilePath is missing or invalid"];
+      const expectedResult = ["host is missing or invalid", "remoteFileName is missing or invalid"];
 
       fork
       (err => {
@@ -433,7 +399,8 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "localhost",
         "port": 1,
-        "remoteFilePath": "file.txt",
+        "remoteFileName": "file.txt",
+        "remoteDirectory": "",
         "user": "",
         "password": "",
       };
@@ -454,9 +421,9 @@ describe("Integration Tests", function() {
       const mockConnectionConfig = {
         "host": "localhost",
         "port": 1,
-        "remoteFilePath": "file.txt",
-        "user": "",
-        "password": "",
+        "remoteFileName": "file.txt",
+        "remoteDirectory": "",
+        "user": "user",
       };
 
       fork
@@ -483,7 +450,7 @@ describe("Integration Tests", function() {
       const mockConfig = {
         "host": "localhost",
         "port": 1,
-        "remoteFilePath": "pathtofile",
+        "remoteFileName": "pathtofile",
         "auth": {
           "user": "",
           "pass": "",

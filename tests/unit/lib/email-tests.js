@@ -1,7 +1,7 @@
 const EventEmitter = require("events");
 const Future = require("fluture");
 const {expect} = require("chai");
-const {sendFileViaEmail} = require("../../../lib/email.js");
+const {sendFileViaEmail} = require("../../../lib/email");
 const {fork} = Future;
 const {Readable} = require("stream");
 
@@ -18,7 +18,7 @@ describe("Unit Tests - Email", function() {
       const mockConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFileName": "",
         "auth": {
           "user": "",
           "pass": "",
@@ -49,7 +49,7 @@ describe("Unit Tests - Email", function() {
       const mockConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFileName": "",
         "auth": {
           "user": "",
           "pass": "",
@@ -87,7 +87,7 @@ describe("Unit Tests - Email", function() {
       const mockConfig = {
         "host": "",
         "port": 1,
-        "remoteFilePath": "",
+        "remoteFileName": "",
         "auth": {
           "user": "",
           "pass": "",

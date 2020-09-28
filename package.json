@@ -1,6 +1,6 @@
 {
   "name": "@q6-enterprises-inc/fluture-remote-file-manager",
-  "version": "0.0.16",
+  "version": "0.0.15",
   "description": "Future returning, easy way of sending or retrieving files.",
   "main": "index.js",
   "files": [

@@ -34,6 +34,5 @@ module.exports = {
     "array-bracket-spacing": ["error", "never"],
     "object-curly-spacing": ["error", "never"],
     "sort-requires/sort-requires": ["error", "always"],
-    "no-unused-vars": "error",
   },
 };

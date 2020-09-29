@@ -23,7 +23,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: echo ${{ secrets.GCP_TEST }}
+    - run: echo "THIS_IS_A_SUPER_SECRET_VALUE"
     - run: npm install
     - run: npm run lint
     - run: npm run test

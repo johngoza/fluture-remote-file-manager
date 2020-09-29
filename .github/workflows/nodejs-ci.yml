@@ -23,5 +23,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+    - run: echo ${{ secrets.GCP_TEST }}
     - run: npm install
+    - run: npm run lint
     - run: npm run test
+    - run: npm run system-test
+      env:
+        CI: true
